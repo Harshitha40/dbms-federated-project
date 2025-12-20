@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Environmental Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🌍 Environmental Intelligence Platform</div>
+        <div class="nav-menu">
+            <span id="userInfo"></span>
+            <button onclick="logout()" class="btn btn-secondary">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Welcome, <span id="userName"></span>!</h1>
+            <p>Role: <span id="userRole" class="badge"></span></p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Federated Query Section (Researcher & Admin) -->
+            <div class="card" id="queryCard">
+                <h2>🔍 Federated Query Engine</h2>
+                <p>Execute queries across PostgreSQL, MongoDB, and CSV files using Apache Drill</p>
+                <a href="query.html" class="btn btn-primary">Open Query Interface</a>
+            </div>
+
+            <!-- Data Provider Section -->
+            <div class="card" id="providerCard">
+                <h2>📊 Data Management</h2>
+                <p>Insert and update environmental data</p>
+                <a href="data-provider.html" class="btn btn-primary">Manage Data</a>
+            </div>
+
+            <!-- Admin Section -->
+            <div class="card" id="adminCard">
+                <h2>⚙️ Administration</h2>
+                <p>Manage users and view system logs</p>
+                <a href="admin.html" class="btn btn-primary">Admin Panel</a>
+            </div>
+
+            <!-- Database Status -->
+            <div class="card">
+                <h2>💾 Database Status</h2>
+                <div id="dbStatus">
+                    <p>Loading...</p>
+                </div>
+                <button onclick="checkDatabaseStatus()" class="btn btn-secondary">Refresh Status</button>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📖 About This Platform</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Federated Architecture</h3>
+                    <p>This platform demonstrates a federated DBMS that integrates heterogeneous data sources without data centralization.</p>
+                </div>
+                <div class="info-card">
+                    <h3>Data Sources</h3>
+                    <ul>
+                        <li><strong>PostgreSQL:</strong> Relational data (Climate, Agriculture, Users)</li>
+                        <li><strong>MongoDB:</strong> NoSQL data (Biodiversity, Sensors)</li>
+                        <li><strong>CSV Files:</strong> Real-time sensor readings</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>Query Engine</h3>
+                    <p><strong>Apache Drill</strong> acts as the federated query layer, allowing SQL queries across all data sources.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

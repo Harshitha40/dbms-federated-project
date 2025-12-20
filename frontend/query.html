@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federated Query - Environmental Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🌍 Environmental Intelligence Platform</div>
+        <div class="nav-menu">
+            <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+            <button onclick="logout()" class="btn btn-secondary">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>🔍 Federated Query Interface</h1>
+        <p class="subtitle">Execute SQL queries across PostgreSQL, MongoDB, and CSV files using Apache Drill</p>
+
+        <!-- Natural Language Query Section -->
+        <div class="query-section">
+            <div class="query-input-area">
+                <h2>💬 Natural Language Query</h2>
+                <p class="info-text">Ask questions in plain English!</p>
+                <input type="text" id="naturalQueryInput" placeholder="e.g., Show all regions with high temperature, List species with climate data, What are the top crop producing regions?" class="natural-input">
+                
+                <div class="query-actions">
+                    <button onclick="executeNaturalQuery()" class="btn btn-primary">🤖 Ask Question</button>
+                    <button onclick="clearNaturalQuery()" class="btn btn-secondary">Clear</button>
+                </div>
+
+                <div id="naturalQueryInfo" class="info-box" style="display:none;">
+                    <strong>Interpreted as:</strong> <span id="interpretation"></span><br>
+                    <strong>Confidence:</strong> <span id="confidence"></span><br>
+                    <strong>Generated SQL:</strong> <pre id="generatedSQL"></pre>
+                </div>
+
+                <div id="naturalMessage" class="message"></div>
+            </div>
+        </div>
+
+        <!-- SQL Query Section -->
+        <div class="query-section">
+            <div class="query-input-area">
+                <h2>📝 SQL Query Editor</h2>
+                <textarea id="queryInput" placeholder="Enter your SQL query here...
+Example:
+SELECT * FROM postgres.public.`region_info` LIMIT 10;"></textarea>
+                
+                <div class="query-actions">
+                    <button onclick="executeQuery()" class="btn btn-primary">Execute Query</button>
+                    <button onclick="clearQuery()" class="btn btn-secondary">Clear</button>
+                </div>
+
+                <div id="queryMessage" class="message"></div>
+            </div>
+
+            <div class="sample-queries">
+                <h2>Sample Federated Queries</h2>
+                <div id="sampleQueriesList">
+                    <p>Loading sample queries...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>Query Results</h2>
+            <div id="resultsArea">
+                <p class="placeholder">Execute a query to see results here</p>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📚 Query Guide</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>PostgreSQL Tables</h3>
+                    <code>postgres.public.`Region_Info`</code><br>
+                    <code>postgres.public.`Climate_Data`</code><br>
+                    <code>postgres.public.`Agriculture_Data`</code><br>
+                    <code>postgres.public.`User_Info`</code><br>
+                    <code>postgres.public.`Query_Log`</code>
+                </div>
+                <div class="info-card">
+                    <h3>MongoDB Collections</h3>
+                    <code>mongo.environmental_db.`Biodiversity_Data`</code><br>
+                    <code>mongo.environmental_db.`Sensor_Logs`</code><br>
+                    <code>mongo.environmental_db.`Air_Quality_History`</code><br>
+                    <code>mongo.environmental_db.`Species_Details`</code><br>
+                    <code>mongo.environmental_db.`Sensor_Metadata`</code>
+                </div>
+                <div class="info-card">
+                    <h3>CSV Files</h3>
+                    <code>dfs.data.`sensor_readings.csv`</code>
+                    <p><small>Contains: timestamp, region_id, co2_level, pm2_5</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="query.js"></script>
+</body>
+</html>

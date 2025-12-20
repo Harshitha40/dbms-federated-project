@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Provider - Environmental Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🌍 Environmental Intelligence Platform</div>
+        <div class="nav-menu">
+            <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
+            <button onclick="logout()" class="btn btn-secondary">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>📊 Data Management Portal</h1>
+        <p class="subtitle">Insert and update environmental data</p>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('climate')">Climate Data</button>
+            <button class="tab-button" onclick="showTab('agriculture')">Agriculture Data</button>
+            <button class="tab-button" onclick="showTab('sensor')">Sensor Logs</button>
+        </div>
+
+        <!-- Climate Data Form -->
+        <div id="climateTab" class="tab-content active">
+            <h2>Insert Climate Data</h2>
+            <form id="climateForm" class="data-form">
+                <div class="form-group">
+                    <label for="climate_region">Region</label>
+                    <select id="climate_region" required>
+                        <option value="">Loading regions...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="temperature">Temperature (°C)</label>
+                    <input type="number" step="0.01" id="temperature" required placeholder="e.g., 25.5">
+                </div>
+                <div class="form-group">
+                    <label for="rainfall">Rainfall (mm)</label>
+                    <input type="number" step="0.01" id="rainfall" required placeholder="e.g., 1500.75">
+                </div>
+                <div class="form-group">
+                    <label for="humidity">Humidity (%)</label>
+                    <input type="number" step="0.01" id="humidity" required placeholder="e.g., 80.5">
+                </div>
+                <button type="submit" class="btn btn-primary">Insert Climate Data</button>
+            </form>
+            <div id="climateMessage" class="message"></div>
+        </div>
+
+        <!-- Agriculture Data Form -->
+        <div id="agricultureTab" class="tab-content">
+            <h2>Insert Agriculture Data</h2>
+            <form id="agricultureForm" class="data-form">
+                <div class="form-group">
+                    <label for="agri_region">Region</label>
+                    <select id="agri_region" required>
+                        <option value="">Loading regions...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="crop_type">Crop Type</label>
+                    <input type="text" id="crop_type" required placeholder="e.g., Wheat">
+                </div>
+                <div class="form-group">
+                    <label for="yield">Yield (tons)</label>
+                    <input type="number" step="0.01" id="yield" required placeholder="e.g., 45.5">
+                </div>
+                <div class="form-group">
+                    <label for="season">Season</label>
+                    <select id="season" required>
+                        <option value="">Select season</option>
+                        <option value="Spring">Spring</option>
+                        <option value="Summer">Summer</option>
+                        <option value="Fall">Fall</option>
+                        <option value="Winter">Winter</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="year">Year</label>
+                    <input type="number" id="year" required placeholder="e.g., 2024" value="2024">
+                </div>
+                <button type="submit" class="btn btn-primary">Insert Agriculture Data</button>
+            </form>
+            <div id="agricultureMessage" class="message"></div>
+        </div>
+
+        <!-- Sensor Log Form -->
+        <div id="sensorTab" class="tab-content">
+            <h2>Insert Sensor Log (MongoDB)</h2>
+            <form id="sensorForm" class="data-form">
+                <div class="form-group">
+                    <label for="sensor_id">Sensor ID</label>
+                    <input type="text" id="sensor_id" required placeholder="e.g., SENS_001">
+                </div>
+                <div class="form-group">
+                    <label for="sensor_region">Region</label>
+                    <select id="sensor_region" required>
+                        <option value="">Loading regions...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="event_type">Event Type</label>
+                    <input type="text" id="event_type" required placeholder="e.g., temperature_spike">
+                </div>
+                <div class="form-group">
+                    <label for="severity">Severity</label>
+                    <select id="severity" required>
+                        <option value="">Select severity</option>
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" required placeholder="Describe the sensor event..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Insert Sensor Log</button>
+            </form>
+            <div id="sensorMessage" class="message"></div>
+        </div>
+    </div>
+
+    <script src="data-provider.js"></script>
+</body>
+</html>

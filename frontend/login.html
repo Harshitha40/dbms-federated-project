@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Federated Environmental Intelligence Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h1>🌍 Environmental Intelligence Platform</h1>
+            <h2>Federated DBMS Login</h2>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="demo-credentials">
+                <h3>Demo Credentials (password: password123)</h3>
+                <div class="credential-box">
+                    <strong>Researcher:</strong><br>
+                    sarah.researcher@example.com
+                </div>
+                <div class="credential-box">
+                    <strong>Data Provider:</strong><br>
+                    mike.provider@example.com
+                </div>
+                <div class="credential-box">
+                    <strong>Administrator:</strong><br>
+                    admin@example.com
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
