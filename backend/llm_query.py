@@ -87,8 +87,9 @@ Fields: air_quality_id, region_id (INT), region_name, aqi (INT), air_quality_lev
 Description: Historical air quality measurements
 
 ### 4. Species_Details
-Fields: species_id, species_name, scientific_name, classification (Object: kingdom, phylum, class, order, family, genus), habitat, conservation_status, population_estimate (INT)
-Description: Detailed species information
+Fields: species_id, common_name, scientific_name, classification (Object), habitat_regions (Array of INT region_ids), conservation_status, population_estimate (INT)
+Description: Detailed species information.
+**Note**: To specific species, join habitat_regions array using FLATTEN is complex. Prefer filtering by region_name in Biodiversity_Data for general queries.
 
 ### 5. Sensor_Metadata
 Fields: sensor_id, sensor_type, location_name, region_id (INT), installation_date (Date), status, last_maintenance (Date)
@@ -182,22 +183,61 @@ Generate a valid SQL query that answers the user's question. Follow these guidel
 
 IMPORTANT: Return ONLY the SQL query. Do NOT include any thinking process, explanations, or tags like <think>.
 
-1. Use the correct table/collection prefixes and backticks
-2. For FEDERATED queries joining PostgreSQL and MongoDB:
-   - MUST use CTEs (WITH clause) to separate data sources
-   - Example: WITH pg_data AS (SELECT ... FROM postgres...), mongo_data AS (SELECT ... FROM mongo...)
-   - Then JOIN the CTEs: SELECT * FROM pg_data JOIN mongo_data ON ...
-   - Do NOT use table aliases (like 'c.column') inside CTE SELECT clauses
-   - AVOID selecting 'timestamp' column in CTEs (reserved keyword, causes parse errors)
-3. For single-database queries, use direct JOINs as normal
-4. MongoDB array fields (endangered_species, dominant_flora):
-   - Do NOT use COUNT(DISTINCT array_field) or aggregate functions on arrays
-   - Simply SELECT the array field and return it as-is
-   - For counting: use the species_count field (already computed) instead of counting endangered_species array
-5. Add LIMIT 10 to prevent large result sets
-6. For CSV files, remember to CAST string columns to appropriate types
-7. Do NOT include semicolons at the end
-7. Return only the SQL query, no explanations
+1. Use the correct table/collection prefixes and backticks.
+2. **FEDERATED QUERY STRATEGY (CRITICAL)**:
+   - Apache Drill requires isolating each table scan into a separate CTE (Common Table Expression) before joining.
+   - **Rule**: Create ONE CTE for EACH table you are using.
+   - **Pattern**:
+     ```sql
+     WITH 
+     pg_region AS (SELECT region_id, region_name FROM postgres.public.`region_info`),
+     pg_climate AS (SELECT region_id, temperature FROM postgres.public.`climate_data`),
+     mongo_bio AS (SELECT region_id, species_count FROM mongo.environmental_db.`Biodiversity_Data`)
+     SELECT r.region_name, c.temperature, b.species_count
+     FROM pg_region r
+     JOIN pg_climate c ON r.region_id = c.region_id
+     JOIN mongo_bio b ON r.region_id = b.region_id
+     LIMIT 50
+     ```
+   - Do NOT join tables inside the CTE definitions.
+   - Do NOT use wildcards (`SELECT *`) in CTEs if possible; select specific columns.
+3. **GROUP BY Queries**:
+   - ALWAYS use CTEs for GROUP BY queries involving joins.
+   - GROUP BY columns must match the non-aggregated SELECT columns exactly.
+   - Example with aggregation:
+     ```sql
+     WITH 
+     pg_region AS (SELECT region_id, region_name FROM postgres.public.`region_info`),
+     pg_climate AS (SELECT region_id, temperature FROM postgres.public.`climate_data`)
+     SELECT r.region_name, AVG(c.temperature) as avg_temp, COUNT(*) as count
+     FROM pg_region r
+     JOIN pg_climate c ON r.region_id = c.region_id
+     GROUP BY r.region_name
+     LIMIT 50
+     ```
+   - Use HAVING for filtering aggregated results (e.g., `HAVING AVG(temperature) > 20`).
+4. **Nested Queries / Subqueries**:
+   - Prefer CTEs over nested subqueries in FROM clause for better readability.
+   - If using subqueries, always alias them: `FROM (SELECT ...) AS subquery_name`.
+   - Example:
+     ```sql
+     WITH aggregated AS (
+         SELECT region_id, AVG(temperature) as avg_temp
+         FROM postgres.public.`climate_data`
+         GROUP BY region_id
+     )
+     SELECT r.region_name, a.avg_temp
+     FROM postgres.public.`region_info` r
+     JOIN aggregated a ON r.region_id = a.region_id
+     WHERE a.avg_temp > 20
+     LIMIT 50
+     ```
+5. **MongoDB Arrays**:
+   - Simply SELECT array fields (e.g., `endangered_species`) and return them.
+6. **CSV Files**:
+   - In the CTE for CSV, CAST columns immediately: `SELECT CAST(region_id AS INT) as id, CAST(co2_level AS FLOAT) as co2 ...`
+7. Always add `LIMIT 50` to the final SELECT.
+8. Return ONLY the SQL query.
 
 SQL Query:"""
 

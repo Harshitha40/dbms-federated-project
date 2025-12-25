@@ -1,81 +1,492 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Environmental Intelligence Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #F7F7F7;
+            --surface-color: #FFFFFF;
+            --text-main: #111111;
+            --text-secondary: #666666;
+            --accent-color: #00CC66;
+            /* Swiss Green */
+            --border-color: #E0E0E0;
+            --mono-font: 'JetBrains Mono', monospace;
+            --sans-font: 'Inter', sans-serif;
+            --easing: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--sans-font);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- LAYOUT --- */
+        .swiss-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 1024px) {
+            .swiss-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 40px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            line-height: 1;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s var(--easing);
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-main);
+            padding-left: 10px;
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 0;
+        }
+
+        .hero-section {
+            padding: 80px 60px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--surface-color);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            background: #111;
+            color: #FFF;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* --- DASHBOARD CARDS --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 0;
+            /* Grid lines handled by borders */
+        }
+
+        .dashboard-card {
+            background: var(--surface-color);
+            padding: 40px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 300px;
+            transition: background 0.3s;
+        }
+
+        .dashboard-card:hover {
+            background: #FAFAFA;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -0.02em;
+        }
+
+        .card-desc {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 30px;
+            flex-grow: 1;
+        }
+
+        /* --- DB STATUS --- */
+        .db-status-container {
+            font-family: var(--mono-font);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* --- BUTTONS --- */
+        .btn-swiss {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            background: var(--text-main);
+            color: var(--surface-color);
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, background 0.2s;
+            width: fit-content;
+        }
+
+        .btn-swiss:hover {
+            transform: translateY(-2px);
+            background: var(--accent-color);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--text-main);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--text-main);
+            color: var(--surface-color);
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .btn-text:hover {
+            color: var(--text-main);
+        }
+
+        /* --- INFO SECTION --- */
+        .info-section {
+            padding: 60px;
+            background: var(--bg-color);
+        }
+
+        .info-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        @media(max-width: 1024px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-item h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .info-item p,
+        .info-item li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .info-item ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-item li::before {
+            content: "— ";
+            color: var(--accent-color);
+        }
+
+        /* --- PROVIDER SPECIFIC --- */
+        #providerDashboard {
+            display: none;
+            padding: 60px;
+            animation: fadeIn 0.4s var(--easing);
+        }
+
+        .provider-section {
+            margin-bottom: 80px;
+        }
+
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            background: #FFF;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s var(--easing);
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🌍 Environmental Intelligence Platform</div>
-        <div class="nav-menu">
-            <span id="userInfo"></span>
-            <button onclick="logout()" class="btn btn-secondary">Logout</button>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="dashboard-header">
-            <h1>Welcome, <span id="userName"></span>!</h1>
-            <p>Role: <span id="userRole" class="badge"></span></p>
-        </div>
-
-        <div class="dashboard-grid">
-            <!-- Federated Query Section (Researcher & Admin) -->
-            <div class="card" id="queryCard">
-                <h2>🔍 Federated Query Engine</h2>
-                <p>Execute queries across PostgreSQL, MongoDB, and CSV files using Apache Drill</p>
-                <a href="query.html" class="btn btn-primary">Open Query Interface</a>
+    <div class="swiss-grid">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand">Federated Climate<br>Platform</div>
+                <nav>
+                    <a href="dashboard.html" id="navDashboard" class="nav-item active"
+                        style="color: var(--text-main); border-bottom: 1px solid var(--accent-color);">Dashboard</a>
+                    <a href="admin.html" id="navAdmin" class="nav-item">Admin Panel</a>
+                </nav>
             </div>
 
-            <!-- Data Provider Section -->
-            <div class="card" id="providerCard">
-                <h2>📊 Data Management</h2>
-                <p>Insert and update environmental data</p>
-                <a href="data-provider.html" class="btn btn-primary">Manage Data</a>
-            </div>
-
-            <!-- Admin Section -->
-            <div class="card" id="adminCard">
-                <h2>⚙️ Administration</h2>
-                <p>Manage users and view system logs</p>
-                <a href="admin.html" class="btn btn-primary">Admin Panel</a>
-            </div>
-
-            <!-- Database Status -->
-            <div class="card">
-                <h2>💾 Database Status</h2>
-                <div id="dbStatus">
-                    <p>Loading...</p>
+            <div style="margin-top: auto;">
+                <div style="margin-bottom: 20px; font-family: var(--mono-font); font-size: 0.8rem;">
+                    <span id="userInfo"></span>
                 </div>
-                <button onclick="checkDatabaseStatus()" class="btn btn-secondary">Refresh Status</button>
+                <button onclick="logout()" class="btn-swiss btn-outline" style="width: 100%;">Logout</button>
             </div>
-        </div>
+        </aside>
 
-        <div class="info-section">
-            <h2>📖 About This Platform</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3>Federated Architecture</h3>
-                    <p>This platform demonstrates a federated DBMS that integrates heterogeneous data sources without data centralization.</p>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="hero-section">
+                <div class="user-welcome">
+                    <h1 class="hero-title">Welcome, <span id="userName">User</span></h1>
                 </div>
-                <div class="info-card">
-                    <h3>Data Sources</h3>
-                    <ul>
-                        <li><strong>PostgreSQL:</strong> Relational data (Climate, Agriculture, Users)</li>
-                        <li><strong>MongoDB:</strong> NoSQL data (Biodiversity, Sensors)</li>
-                        <li><strong>CSV Files:</strong> Real-time sensor readings</li>
-                    </ul>
+                <p class="hero-subtitle">
+                    Role: <span id="userRole" class="badge">Loading...</span>
+                </p>
+            </header>
+
+            <!-- DASHBOARD GRID (Researcher/Admin Default) -->
+            <div id="defaultDashboard" class="dashboard-grid">
+
+                <!-- Query Card -->
+                <div class="dashboard-card" id="queryCard">
+                    <div>
+                        <div class="card-title">Federated Query Engine</div>
+                        <p class="card-desc">Execute complex SQL queries across PostgreSQL, MongoDB, and CSV files using
+                            Apache Drill architecture.</p>
+                    </div>
+                    <a href="query.html" class="btn-swiss">Open Interface</a>
                 </div>
-                <div class="info-card">
-                    <h3>Query Engine</h3>
-                    <p><strong>Apache Drill</strong> acts as the federated query layer, allowing SQL queries across all data sources.</p>
+
+                <!-- Provider Card -->
+                <div class="dashboard-card" id="providerCard">
+                    <div>
+                        <div class="card-title">Data Management</div>
+                        <p class="card-desc">Insert and update environmental data records for climate, agriculture, and
+                            sensor logs.</p>
+                    </div>
+                    <a href="data-provider.html" class="btn-swiss">Manage Data</a>
+                </div>
+
+                <!-- Admin Card -->
+                <div class="dashboard-card" id="adminCard">
+                    <div>
+                        <div class="card-title">System Administration</div>
+                        <p class="card-desc">Manage user access controls, view system logs, and monitor platform health.
+                        </p>
+                    </div>
+                    <a href="admin.html" class="btn-swiss">Admin Panel</a>
+                </div>
+
+                <!-- Status Card -->
+                <div class="dashboard-card">
+                    <div>
+                        <div class="card-title">Database Status</div>
+                        <div id="dbStatus" class="db-status-container">
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                    <button onclick="checkDatabaseStatus()" class="btn-text">Refresh Status</button>
+                </div>
+
+            </div>
+
+            <!-- PROVIDER SPECIFIC DASHBOARD -->
+            <div id="providerDashboard">
+                <section class="provider-section">
+                    <div class="info-title">Data Contribution</div>
+                    <h2 class="hero-title" style="font-size: 2.5rem;">Add New Records.</h2>
+                    <p class="hero-subtitle">Contribute to the environmental database by selecting a category below.</p>
+
+                    <div class="provider-grid">
+                        <a href="data-provider.html?tab=climate" class="feature-card">
+                            <div class="card-title">Climate Data</div>
+                            <p class="card-desc">Temperature, rainfall, and humidity readings by region.</p>
+                            <span class="btn-text">Add Records →</span>
+                        </a>
+                        <a href="data-provider.html?tab=agriculture" class="feature-card">
+                            <div class="card-title">Agriculture</div>
+                            <p class="card-desc">Crop yields, seasonal data, and agricultural statistics.</p>
+                            <span class="btn-text">Add Records →</span>
+                        </a>
+                        <a href="data-provider.html?tab=sensor" class="feature-card">
+                            <div class="card-title">Sensor Logs</div>
+                            <p class="card-desc">Log environmental anomalies and sensor events.</p>
+                            <span class="btn-text">Log Event →</span>
+                        </a>
+                        <a href="data-provider.html" class="feature-card">
+                            <div class="card-title">All Categories</div>
+                            <p class="card-desc">View all 8 supported data tables including Biodiversity and Species.
+                            </p>
+                            <span class="btn-text">View All →</span>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="provider-section">
+                    <div class="info-title">AI Insights</div>
+                    <h2 class="hero-title" style="font-size: 2.5rem;">Ask About Your Data.</h2>
+                    <p class="hero-subtitle">Analyze how your contributions affect the platform and query the current
+                        state of any table.</p>
+
+                    <div style="margin-top: 40px; max-width: 800px;">
+                        <input type="text" id="providerQueryInput" class="swiss-input"
+                            placeholder="e.g. How many regions have I added climate data for?">
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button onclick="executeProviderQuery()" class="btn-swiss">Ask AI</button>
+                            <button onclick="document.getElementById('providerQueryInput').value=''"
+                                class="btn-swiss btn-outline">Clear</button>
+                        </div>
+
+                        <div id="providerMessage" class="message" style="margin-top: 20px;"></div>
+
+                        <!-- Results Area -->
+                        <div id="providerResultsArea" style="margin-top: 40px;"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- INFO SECTION -->
+            <div class="info-section">
+                <div class="info-title">Platform Overview</div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h3>Federated Architecture</h3>
+                        <p>This platform demonstrates a federated DBMS that integrates heterogeneous data sources
+                            without centralization.</p>
+                    </div>
+                    <div class="info-item">
+                        <h3>Data Sources</h3>
+                        <ul>
+                            <li><strong>PostgreSQL:</strong> Relational data</li>
+                            <li><strong>MongoDB:</strong> NoSQL data</li>
+                            <li><strong>CSV Files:</strong> Sensor readings</li>
+                        </ul>
+                    </div>
+                    <div class="info-item">
+                        <h3>Query Engine</h3>
+                        <p><strong>Apache Drill</strong> acts as the federated layer, allowing ANSI SQL queries across
+                            all connected data sources.</p>
+                    </div>
                 </div>
             </div>
-        </div>
+
+        </main>
     </div>
 
+    <!-- Load existing logic -->
     <script src="dashboard.js"></script>
 </body>
+
 </html>

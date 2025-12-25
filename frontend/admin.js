@@ -2,7 +2,7 @@
 // Admin Panel JavaScript
 // ========================================
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = '';
 
 window.addEventListener('DOMContentLoaded', async () => {
     await checkAuth();
@@ -14,12 +14,12 @@ async function checkAuth() {
         const response = await fetch(`${API_BASE_URL}/api/current-user`, {
             credentials: 'include'
         });
-        
+
         if (!response.ok) {
             window.location.href = 'login.html';
             return;
         }
-        
+
         const data = await response.json();
         if (!data.success || data.user.role !== 'Administrator') {
             alert('Access denied. Administrator role required.');
@@ -34,13 +34,13 @@ async function checkAuth() {
 function showTab(tabName) {
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => tab.classList.remove('active'));
-    
+
     const buttons = document.querySelectorAll('.tab-button');
     buttons.forEach(btn => btn.classList.remove('active'));
-    
+
     document.getElementById(`${tabName}Tab`).classList.add('active');
     event.target.classList.add('active');
-    
+
     if (tabName === 'logs') {
         loadQueryLogs();
     }
@@ -49,18 +49,18 @@ function showTab(tabName) {
 // Create User Form
 document.getElementById('createUserForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const messageDiv = document.getElementById('createUserMessage');
     messageDiv.textContent = '';
     messageDiv.className = 'message';
-    
+
     const data = {
         name: document.getElementById('user_name').value,
         email: document.getElementById('user_email').value,
         password: document.getElementById('user_password').value,
         role: document.getElementById('user_role').value
     };
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/api/users`, {
             method: 'POST',
@@ -70,9 +70,9 @@ document.getElementById('createUserForm').addEventListener('submit', async (e) =
             credentials: 'include',
             body: JSON.stringify(data)
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             messageDiv.textContent = 'User created successfully!';
             messageDiv.className = 'message success';
@@ -92,14 +92,14 @@ document.getElementById('createUserForm').addEventListener('submit', async (e) =
 async function loadUsers() {
     const container = document.getElementById('usersList');
     container.innerHTML = '<p>Loading users...</p>';
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/api/users`, {
             credentials: 'include'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             displayUsers(data.users);
         } else {
@@ -113,16 +113,16 @@ async function loadUsers() {
 
 function displayUsers(users) {
     const container = document.getElementById('usersList');
-    
+
     if (!users || users.length === 0) {
         container.innerHTML = '<p>No users found</p>';
         return;
     }
-    
+
     let tableHTML = '<table class="results-table">';
     tableHTML += '<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>';
     tableHTML += '<tbody>';
-    
+
     users.forEach(user => {
         const createdDate = new Date(user.created_at).toLocaleDateString();
         tableHTML += `
@@ -138,7 +138,7 @@ function displayUsers(users) {
             </tr>
         `;
     });
-    
+
     tableHTML += '</tbody></table>';
     container.innerHTML = tableHTML;
 }
@@ -147,15 +147,15 @@ async function deleteUser(userId, userName) {
     if (!confirm(`Are you sure you want to delete user "${userName}"?`)) {
         return;
     }
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
             method: 'DELETE',
             credentials: 'include'
         });
-        
+
         const result = await response.json();
-        
+
         if (result.success) {
             alert('User deleted successfully');
             await loadUsers();
@@ -171,14 +171,14 @@ async function deleteUser(userId, userName) {
 async function loadQueryLogs() {
     const container = document.getElementById('queryLogsList');
     container.innerHTML = '<p>Loading query logs...</p>';
-    
+
     try {
         const response = await fetch(`${API_BASE_URL}/api/query-logs?limit=50`, {
             credentials: 'include'
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             displayQueryLogs(data.logs);
         } else {
@@ -192,22 +192,22 @@ async function loadQueryLogs() {
 
 function displayQueryLogs(logs) {
     const container = document.getElementById('queryLogsList');
-    
+
     if (!logs || logs.length === 0) {
         container.innerHTML = '<p>No query logs found</p>';
         return;
     }
-    
+
     let tableHTML = '<table class="results-table">';
     tableHTML += '<thead><tr><th>ID</th><th>User</th><th>Role</th><th>Query</th><th>Executed At</th></tr></thead>';
     tableHTML += '<tbody>';
-    
+
     logs.forEach(log => {
         const executedDate = new Date(log.executed_at).toLocaleString();
-        const queryPreview = log.query_text.length > 100 
-            ? log.query_text.substring(0, 100) + '...' 
+        const queryPreview = log.query_text.length > 100
+            ? log.query_text.substring(0, 100) + '...'
             : log.query_text;
-        
+
         tableHTML += `
             <tr>
                 <td>${log.query_id}</td>
@@ -218,7 +218,7 @@ function displayQueryLogs(logs) {
             </tr>
         `;
     });
-    
+
     tableHTML += '</tbody></table>';
     container.innerHTML = tableHTML;
 }

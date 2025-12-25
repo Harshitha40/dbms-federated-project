@@ -33,6 +33,7 @@ CREATE DATABASE environmental_db;
 # Database: environmental_db
 # Port: 5432
 # Host: localhost
+# IMPORTANT: Create a `.env` file at the project root with `POSTGRES_PASSWORD=<your_postgres_password>` so the Flask app can connect. Use `.env.example` as a template.
 
 # ========================================
 # Test Login Credentials (password: 'password123')

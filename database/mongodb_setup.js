@@ -169,6 +169,81 @@ db.Air_Quality_History.insertMany([
         },
         air_quality_level: "Excellent",
         recorded_at: new Date("2024-03-01T00:00:00Z")
+    },
+    {
+        reading_id: "AQ005",
+        region_id: 9,   // Patagonia
+        aqi: 32,
+        pollutants: {
+            co2: 395,
+            pm2_5: 6.8,
+            pm10: 14.5,
+            no2: 7.2,
+            so2: 4.1,
+            o3: 48.9
+        },
+        air_quality_level: "Excellent",
+        recorded_at: new Date("2024-03-01T00:00:00Z")
+    },
+    {
+        reading_id: "AQ006",
+        region_id: 13,  // Sundarbans
+        aqi: 115,
+        pollutants: {
+            co2: 430,
+            pm2_5: 42.7,
+            pm10: 65.3,
+            no2: 30.6,
+            so2: 22.8,
+            o3: 78.4
+        },
+        air_quality_level: "Moderate",
+        recorded_at: new Date("2024-03-01T00:00:00Z")
+    },
+    {
+        reading_id: "AQ007",
+        region_id: 14,  // Borneo Rainforest
+        aqi: 58,
+        pollutants: {
+            co2: 405,
+            pm2_5: 14.9,
+            pm10: 28.6,
+            no2: 12.4,
+            so2: 9.6,
+            o3: 60.7
+        },
+        air_quality_level: "Good",
+        recorded_at: new Date("2024-03-01T00:00:00Z")
+    },
+    {
+        reading_id: "AQ008",
+        region_id: 16,  // Atacama Desert
+        aqi: 22,
+        pollutants: {
+            co2: 385,
+            pm2_5: 4.1,
+            pm10: 9.8,
+            no2: 5.3,
+            so2: 2.6,
+            o3: 40.2
+        },
+        air_quality_level: "Excellent",
+        recorded_at: new Date("2024-03-01T00:00:00Z")
+    },
+    {
+        reading_id: "AQ009",
+        region_id: 20,  // Okavango Delta
+        aqi: 78,
+        pollutants: {
+            co2: 420,
+            pm2_5: 26.4,
+            pm10: 44.9,
+            no2: 20.1,
+            so2: 14.7,
+            o3: 69.3
+        },
+        air_quality_level: "Good",
+        recorded_at: new Date("2024-03-01T00:00:00Z")
     }
 ]);
 
@@ -248,6 +323,96 @@ db.Species_Details.insertMany([
         threats: ["Deforestation", "Hunting", "Pet Trade"],
         diet: "Omnivore",
         lifespan_years: 18
+    },
+    {
+        species_id: "SP005",
+        common_name: "Andean Condor",
+        scientific_name: "Vultur gryphus",
+        classification: {
+            kingdom: "Animalia",
+            phylum: "Chordata",
+            class: "Aves",
+            order: "Cathartiformes",
+            family: "Cathartidae"
+        },
+        habitat_regions: [10, 19],
+        population_estimate: 6700,
+        conservation_status: "Vulnerable",
+        threats: ["Poisoning", "Habitat Degradation", "Human Conflict"],
+        diet: "Carnivore",
+        lifespan_years: 50
+    },
+    {
+        species_id: "SP006",
+        common_name: "Snow Leopard",
+        scientific_name: "Panthera uncia",
+        classification: {
+            kingdom: "Animalia",
+            phylum: "Chordata",
+            class: "Mammalia",
+            order: "Carnivora",
+            family: "Felidae"
+        },
+        habitat_regions: [6, 19],
+        population_estimate: 4500,
+        conservation_status: "Vulnerable",
+        threats: ["Poaching", "Climate Change", "Prey Loss"],
+        diet: "Carnivore",
+        lifespan_years: 20
+    },
+    {
+        species_id: "SP007",
+        common_name: "African Wild Dog",
+        scientific_name: "Lycaon pictus",
+        classification: {
+            kingdom: "Animalia",
+            phylum: "Chordata",
+            class: "Mammalia",
+            order: "Carnivora",
+            family: "Canidae"
+        },
+        habitat_regions: [20],
+        population_estimate: 6600,
+        conservation_status: "Endangered",
+        threats: ["Habitat Fragmentation", "Disease", "Human Conflict"],
+        diet: "Carnivore",
+        lifespan_years: 11
+    },
+    {
+        species_id: "SP008",
+        common_name: "Siberian Crane",
+        scientific_name: "Leucogeranus leucogeranus",
+        classification: {
+            kingdom: "Animalia",
+            phylum: "Chordata",
+            class: "Aves",
+            order: "Gruiformes",
+            family: "Gruidae"
+        },
+        habitat_regions: [15],
+        population_estimate: 4000,
+        conservation_status: "Critically Endangered",
+        threats: ["Wetland Loss", "Climate Change", "Pollution"],
+        diet: "Omnivore",
+        lifespan_years: 30
+    },
+    {
+        species_id: "SP009",
+        common_name: "Galápagos Giant Tortoise",
+        scientific_name: "Chelonoidis nigra",
+        classification: {
+            kingdom: "Animalia",
+            phylum: "Chordata",
+            class: "Reptilia",
+            order: "Testudines",
+            family: "Testudinidae"
+        },
+        habitat_regions: [17],
+        population_estimate: 15000,
+        conservation_status: "Vulnerable",
+        threats: ["Invasive Species", "Habitat Loss", "Climate Change"],
+        diet: "Herbivore",
+        lifespan_years: 100
     }
 ]);
 
@@ -340,6 +505,91 @@ db.Sensor_Metadata.insertMany([
             latitude: 41.4925,
             longitude: -99.9018
         }
+    },
+    {
+        sensor_id: "SENS_009",
+        sensor_type: "Climate Monitor",
+        region_id: 9,
+        region_name: "Patagonia",
+        manufacturer: "EnviroTech",
+        model: "ET-CM-700",
+        installation_date: new Date("2022-11-18"),
+        last_maintenance: new Date("2024-01-25"),
+        status: "active",
+        measurements: ["temperature", "humidity", "wind_speed"],
+        accuracy_rating: 0.96,
+        coordinates: {
+            latitude: -49.3315,
+            longitude: -72.8860
+        }
+    },
+    {
+        sensor_id: "SENS_010",
+        sensor_type: "Atmospheric Monitor",
+        region_id: 10,
+        region_name: "Andes Mountains",
+        manufacturer: "SkyMetrics",
+        model: "SM-ATM-410",
+        installation_date: new Date("2023-02-14"),
+        last_maintenance: new Date("2024-02-02"),
+        status: "active",
+        measurements: ["temperature", "pressure", "ozone"],
+        accuracy_rating: 0.95,
+        coordinates: {
+            latitude: -13.1631,
+            longitude: -72.5450
+        }
+    },
+    {
+        sensor_id: "SENS_013",
+        sensor_type: "Hydro-Climate Monitor",
+        region_id: 13,
+        region_name: "Sundarbans Mangrove Forest",
+        manufacturer: "EcoHydro",
+        model: "EH-HC-880",
+        installation_date: new Date("2022-07-09"),
+        last_maintenance: new Date("2024-01-30"),
+        status: "active",
+        measurements: ["rainfall", "humidity", "soil_moisture", "salinity"],
+        accuracy_rating: 0.97,
+        coordinates: {
+            latitude: 21.9497,
+            longitude: 89.1833
+        }
+    },
+    {
+        sensor_id: "SENS_016",
+        sensor_type: "Air Quality Monitor",
+        region_id: 16,
+        region_name: "Atacama Desert",
+        manufacturer: "AirWatch",
+        model: "AW-AQ-450",
+        installation_date: new Date("2023-05-21"),
+        last_maintenance: new Date("2024-02-18"),
+        status: "active",
+        measurements: ["PM2.5", "PM10", "CO2", "NO2"],
+        accuracy_rating: 0.93,
+        coordinates: {
+            latitude: -23.8634,
+            longitude: -69.1328
+        }
+    },
+    {
+        sensor_id: "SENS_020",
+        sensor_type: "Wildlife Climate Monitor",
+        region_id: 20,
+        region_name: "Okavango Delta",
+        manufacturer: "BioTrack",
+        model: "BT-WC-300",
+        installation_date: new Date("2022-10-03"),
+        last_maintenance: new Date("2024-01-12"),
+        status: "active",
+        measurements: ["temperature", "humidity", "water_level"],
+        accuracy_rating: 0.96,
+        coordinates: {
+            latitude: -19.2870,
+            longitude: 22.4430
+        }
     }
 ]);
 
@@ -361,10 +611,10 @@ db.Sensor_Metadata.createIndex({ sensor_id: 1 });
 // db.Species_Details.find().pretty();
 // db.Sensor_Metadata.find().pretty();
 
-print("MongoDB collections created successfully!");
-print("Total documents:");
-print("- Biodiversity_Data: " + db.Biodiversity_Data.countDocuments());
-print("- Sensor_Logs: " + db.Sensor_Logs.countDocuments());
-print("- Air_Quality_History: " + db.Air_Quality_History.countDocuments());
-print("- Species_Details: " + db.Species_Details.countDocuments());
-print("- Sensor_Metadata: " + db.Sensor_Metadata.countDocuments());
+printjson("MongoDB collections created successfully!");
+printjson("Total documents:");
+printjson("- Biodiversity_Data: " + db.Biodiversity_Data.countDocuments());
+printjson("- Sensor_Logs: " + db.Sensor_Logs.countDocuments());
+printjson("- Air_Quality_History: " + db.Air_Quality_History.countDocuments());
+printjson("- Species_Details: " + db.Species_Details.countDocuments());
+printjson("- Sensor_Metadata: " + db.Sensor_Metadata.countDocuments());

@@ -58,9 +58,11 @@ Use this checklist before running your application for the first time.
   \q
   ```
 
-- [ ] Updated backend/config.py with correct password
-  ```python
-  'password': 'your_actual_postgres_password'
+- [ ] Created a `.env` file from `.env.example` with `POSTGRES_PASSWORD=<your_postgres_password>`
+  ```bash
+  # Copy and edit
+  copy .env.example .env
+  # Edit .env and set POSTGRES_PASSWORD
   ```
 
 - [ ] Verified data exists
@@ -184,9 +186,9 @@ Use this checklist before running your application for the first time.
   -- Should show all packages
   ```
 
-- [ ] Updated config.py with PostgreSQL password
-  - File: `backend/config.py`
-  - Line: `'password': 'your_actual_password'`
+- [ ] Created `.env` and restarted backend with the new credentials
+  - File: `.env` (created from `.env.example`)
+  - Ensure `POSTGRES_PASSWORD` is set and then restart Flask server
 
 - [ ] Started Flask server
   ```powershell

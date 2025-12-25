@@ -1,85 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Environmental Intelligence Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Admin Panel - Environmental Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #F7F7F7;
+            --surface-color: #FFFFFF;
+            --text-main: #111111;
+            --text-secondary: #666666;
+            --accent-color: #00CC66;
+            /* Swiss Green */
+            --border-color: #E0E0E0;
+            --error-color: #FF3D00;
+            --mono-font: 'JetBrains Mono', monospace;
+            --sans-font: 'Inter', sans-serif;
+            --easing: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--sans-font);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- LAYOUT --- */
+        .swiss-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 1024px) {
+            .swiss-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 40px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            line-height: 1;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s var(--easing);
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-main);
+            padding-left: 10px;
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 0;
+        }
+
+        .hero-section {
+            padding: 80px 60px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--surface-color);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* --- TABS --- */
+        .swiss-tabs {
+            display: flex;
+            gap: 40px;
+            padding: 0 60px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--surface-color);
+        }
+
+        .tab-button {
+            padding: 20px 0;
+            background: none;
+            border: none;
+            font-family: var(--sans-font);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab-button.active {
+            color: var(--text-main);
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-color);
+        }
+
+        /* --- CONTENT AREAS --- */
+        .content-container {
+            padding: 60px;
+            max-width: 1200px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: slideUp 0.4s var(--easing) forwards;
+            opacity: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* --- FORMS --- */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .swiss-label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .swiss-input,
+        .swiss-select {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            background: transparent;
+            font-size: 1.1rem;
+            font-family: var(--sans-font);
+            padding: 10px 0;
+            transition: border-color 0.3s var(--easing);
+            outline: none;
+            border-radius: 0;
+            color: var(--text-main);
+        }
+
+        .swiss-input:focus,
+        .swiss-select:focus {
+            border-color: var(--text-main);
+        }
+
+        .swiss-select {
+            cursor: pointer;
+            -webkit-appearance: none;
+            border-radius: 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media(max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+
+        /* --- TABLES --- */
+        .table-container {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        /* Styles for dynamic tables generated by admin.js */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono-font);
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: #FAFAFA;
+            padding: 16px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: #F9FFF9;
+            color: var(--text-main);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-swiss {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            background: var(--text-main);
+            color: var(--surface-color);
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-swiss:hover {
+            transform: translateY(-2px);
+            background: var(--accent-color);
+        }
+
+        .btn-secondary {
+            padding: 8px 16px;
+            font-size: 0.7rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-main);
+            background: var(--text-main);
+            color: var(--surface-color);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--text-main);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--text-main);
+            color: var(--surface-color);
+        }
+
+        /* --- UTILS --- */
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            font-family: var(--mono-font);
+            font-size: 0.85rem;
+            border-left: 4px solid #333;
+            display: none;
+        }
+
+        .message.success {
+            border-color: var(--accent-color);
+            background: #E8F5E9;
+            color: #1B5E20;
+        }
+
+        .message.error {
+            border-color: var(--error-color);
+            background: #FFEBEE;
+            color: #B71C1C;
+        }
+    </style>
 </head>
+
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🌍 Environmental Intelligence Platform</div>
-        <div class="nav-menu">
-            <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
-            <button onclick="logout()" class="btn btn-secondary">Logout</button>
-        </div>
-    </nav>
+    <div class="swiss-grid">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand">Federated Climate<br>Platform</div>
+                <nav>
+                    <a href="dashboard.html" class="nav-item">Dashboard</a>
+                    <a href="query.html" class="nav-item">Federated Query</a>
+                    <a href="data-provider.html" class="nav-item">Data Provider</a>
+                    <a href="#" class="nav-item active"
+                        style="color: var(--text-main); border-bottom: 1px solid var(--accent-color);">Admin Panel</a>
+                </nav>
+            </div>
+            <button onclick="logout()" class="btn-swiss btn-outline" style="width: 100%;">Logout</button>
+        </aside>
 
-    <div class="container">
-        <h1>⚙️ Administration Panel</h1>
-        <p class="subtitle">Manage users and monitor system activity</p>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="hero-section">
+                <h1 class="hero-title">Administration.</h1>
+                <p class="hero-subtitle">Manage users and monitor system activity logs.</p>
+            </header>
 
-        <div class="tabs">
-            <button class="tab-button active" onclick="showTab('users')">User Management</button>
-            <button class="tab-button" onclick="showTab('logs')">Query Logs</button>
-        </div>
+            <!-- TABS -->
+            <div class="swiss-tabs">
+                <button class="tab-button active" onclick="showTab('users')">User Management</button>
+                <button class="tab-button" onclick="showTab('logs')">Query Logs</button>
+            </div>
 
-        <!-- User Management Tab -->
-        <div id="usersTab" class="tab-content active">
-            <div class="admin-section">
-                <h2>Create New User</h2>
-                <form id="createUserForm" class="data-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="user_name">Name</label>
-                            <input type="text" id="user_name" required placeholder="Full Name">
+            <div class="content-container">
+
+                <!-- USER MANAGEMENT TAB -->
+                <div id="usersTab" class="tab-content active">
+
+                    <!-- Create User Section -->
+                    <div style="margin-bottom: 60px; max-width: 800px;">
+                        <div class="section-header">
+                            <span>Create New User</span>
                         </div>
-                        <div class="form-group">
-                            <label for="user_email">Email</label>
-                            <input type="email" id="user_email" required placeholder="email@example.com">
+
+                        <form id="createUserForm">
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label class="swiss-label" for="user_name">Name</label>
+                                    <input type="text" id="user_name" class="swiss-input" required
+                                        placeholder="Full Name">
+                                </div>
+                                <div class="form-group">
+                                    <label class="swiss-label" for="user_email">Email</label>
+                                    <input type="email" id="user_email" class="swiss-input" required
+                                        placeholder="email@example.com">
+                                </div>
+                            </div>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label class="swiss-label" for="user_password">Password</label>
+                                    <input type="password" id="user_password" class="swiss-input" required
+                                        placeholder="Password">
+                                </div>
+                                <div class="form-group">
+                                    <label class="swiss-label" for="user_role">Role</label>
+                                    <select id="user_role" class="swiss-select" required>
+                                        <option value="" disabled selected>Select Role...</option>
+                                        <option value="Researcher">Researcher</option>
+                                        <option value="Data Provider">Data Provider</option>
+                                        <option value="Administrator">Administrator</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-swiss">Create User Account</button>
+                        </form>
+                        <div id="createUserMessage" class="message"></div>
+                    </div>
+
+                    <!-- User List Section -->
+                    <div>
+                        <div class="section-header">
+                            <span>Existing Users</span>
+                            <button onclick="loadUsers()" class="btn-secondary">Refresh List</button>
+                        </div>
+                        <div id="usersList" class="table-container">
+                            <p style="padding: 20px; color: #999; font-family: var(--mono-font);">Loading users...</p>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="user_password">Password</label>
-                            <input type="password" id="user_password" required placeholder="Password">
-                        </div>
-                        <div class="form-group">
-                            <label for="user_role">Role</label>
-                            <select id="user_role" required>
-                                <option value="">Select Role</option>
-                                <option value="Researcher">Researcher</option>
-                                <option value="Data Provider">Data Provider</option>
-                                <option value="Administrator">Administrator</option>
-                            </select>
-                        </div>
+                </div>
+
+                <!-- QUERY LOGS TAB -->
+                <div id="logsTab" class="tab-content">
+                    <div class="section-header">
+                        <span>System Activity</span>
+                        <button onclick="loadQueryLogs()" class="btn-secondary">Refresh Logs</button>
                     </div>
-                    <button type="submit" class="btn btn-primary">Create User</button>
-                </form>
-                <div id="createUserMessage" class="message"></div>
-            </div>
-
-            <div class="admin-section">
-                <h2>All Users</h2>
-                <button onclick="loadUsers()" class="btn btn-secondary">Refresh List</button>
-                <div id="usersList" class="table-container">
-                    <p>Loading users...</p>
+                    <div id="queryLogsList" class="table-container">
+                        <p style="padding: 20px; color: #999; font-family: var(--mono-font);">Loading logs...</p>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Query Logs Tab -->
-        <div id="logsTab" class="tab-content">
-            <div class="admin-section">
-                <h2>Query Execution Logs</h2>
-                <button onclick="loadQueryLogs()" class="btn btn-secondary">Refresh Logs</button>
-                <div id="queryLogsList" class="table-container">
-                    <p>Loading query logs...</p>
-                </div>
             </div>
-        </div>
+        </main>
     </div>
 
+    <!-- Ensure logic matches existing admin.js expectations -->
     <script src="admin.js"></script>
 </body>
+
 </html>

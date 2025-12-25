@@ -1,131 +1,642 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Provider - Environmental Intelligence Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Data Provider - Environmental Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #F7F7F7;
+            --surface-color: #FFFFFF;
+            --text-main: #111111;
+            --text-secondary: #666666;
+            --accent-color: #00CC66;
+            /* Swiss Green */
+            --border-color: #E0E0E0;
+            --error-color: #FF3D00;
+            --mono-font: 'JetBrains Mono', monospace;
+            --sans-font: 'Inter', sans-serif;
+            --easing: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--sans-font);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- LAYOUT --- */
+        .swiss-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 1024px) {
+            .swiss-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 40px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            line-height: 1;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s var(--easing);
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-main);
+            padding-left: 10px;
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 0;
+        }
+
+        .hero-section {
+            padding: 80px 60px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--surface-color);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* --- FORMS --- */
+        .content-container {
+            padding: 60px;
+            max-width: 900px;
+        }
+
+        /* Animation for form switching */
+        .tab-content {
+            display: none;
+            animation: slideUp 0.4s var(--easing) forwards;
+            opacity: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+            letter-spacing: -0.02em;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        .swiss-label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        /* Matches input[type="text"], input[type="number"], select */
+        .swiss-input,
+        select {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            background: transparent;
+            font-size: 1.25rem;
+            font-family: var(--sans-font);
+            padding: 10px 0;
+            transition: border-color 0.3s var(--easing);
+            outline: none;
+            border-radius: 0;
+            color: var(--text-main);
+        }
+
+        select {
+            cursor: pointer;
+            border-radius: 0;
+            -webkit-appearance: none;
+        }
+
+        .swiss-input:focus,
+        select:focus {
+            border-color: var(--text-main);
+        }
+
+        .swiss-input::placeholder {
+            color: #CCC;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: #F4F4F4;
+            border: none;
+            padding: 20px;
+            font-family: var(--mono-font);
+            font-size: 0.9rem;
+            color: var(--text-main);
+            resize: vertical;
+            outline: none;
+            border-left: 4px solid transparent;
+            transition: border-left 0.3s var(--easing);
+        }
+
+        textarea:focus {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-swiss {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            background: var(--text-main);
+            color: var(--surface-color);
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s var(--easing), background 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-swiss:hover {
+            transform: translateY(-2px);
+            background: var(--accent-color);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--text-main);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--text-main);
+            color: var(--surface-color);
+        }
+
+        /* --- MESSAGES --- */
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            font-family: var(--mono-font);
+            font-size: 0.85rem;
+            border-left: 4px solid #333;
+            display: none;
+        }
+
+        .message.success {
+            border-color: var(--accent-color);
+            background: #E8F5E9;
+            color: #1B5E20;
+        }
+
+        .message.error {
+            border-color: var(--error-color);
+            background: #FFEBEE;
+            color: #B71C1C;
+        }
+    </style>
 </head>
+
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🌍 Environmental Intelligence Platform</div>
-        <div class="nav-menu">
-            <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
-            <button onclick="logout()" class="btn btn-secondary">Logout</button>
-        </div>
-    </nav>
+    <div class="swiss-grid">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand">Federated Climate<br>Platform</div>
+                <nav>
+                    <a href="dashboard.html" id="navDashboard" class="nav-item">Dashboard</a>
+                    <a href="query.html" id="navQuery" class="nav-item">Federated Query</a>
+                    <a href="data-provider.html" id="navDataProvider" class="nav-item active"
+                        style="color: var(--text-main); border-bottom: 1px solid var(--accent-color);">Data Provider</a>
+                    <a href="admin.html" id="navAdmin" class="nav-item">Admin Panel</a>
+                </nav>
+            </div>
+            <button onclick="logout()" class="btn-swiss btn-outline" style="width: 100%;">Logout</button>
+        </aside>
 
-    <div class="container">
-        <h1>📊 Data Management Portal</h1>
-        <p class="subtitle">Insert and update environmental data</p>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header class="hero-section">
+                <h1 class="hero-title">Data Management.</h1>
+                <p class="hero-subtitle">Insert and update environmental data records across PostgreSQL and MongoDB.</p>
+            </header>
 
-        <div class="tabs">
-            <button class="tab-button active" onclick="showTab('climate')">Climate Data</button>
-            <button class="tab-button" onclick="showTab('agriculture')">Agriculture Data</button>
-            <button class="tab-button" onclick="showTab('sensor')">Sensor Logs</button>
-        </div>
+            <div class="content-container">
 
-        <!-- Climate Data Form -->
-        <div id="climateTab" class="tab-content active">
-            <h2>Insert Climate Data</h2>
-            <form id="climateForm" class="data-form">
-                <div class="form-group">
-                    <label for="climate_region">Region</label>
-                    <select id="climate_region" required>
-                        <option value="">Loading regions...</option>
+                <!-- Table Selection Dropdown -->
+                <div class="form-group"
+                    style="margin-bottom: 50px; padding-bottom: 30px; border-bottom: 1px solid var(--border-color);">
+                    <label class="swiss-label" for="tableSelector">Select Target Table</label>
+                    <select id="tableSelector" onchange="showTab(this.value)">
+                        <option value="climate" selected>Climate Data (Postgres)</option>
+                        <option value="agriculture">Agriculture Data (Postgres)</option>
+                        <option value="region">Region Info (Postgres)</option>
+                        <option value="sensor">Sensor Logs (Mongo)</option>
+                        <option value="biodiversity">Biodiversity Data (Mongo)</option>
+                        <option value="air_quality">Air Quality History (Mongo)</option>
+                        <option value="species">Species Details (Mongo)</option>
+                        <option value="sensor_metadata">Sensor Metadata (Mongo)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="temperature">Temperature (°C)</label>
-                    <input type="number" step="0.01" id="temperature" required placeholder="e.g., 25.5">
-                </div>
-                <div class="form-group">
-                    <label for="rainfall">Rainfall (mm)</label>
-                    <input type="number" step="0.01" id="rainfall" required placeholder="e.g., 1500.75">
-                </div>
-                <div class="form-group">
-                    <label for="humidity">Humidity (%)</label>
-                    <input type="number" step="0.01" id="humidity" required placeholder="e.g., 80.5">
-                </div>
-                <button type="submit" class="btn btn-primary">Insert Climate Data</button>
-            </form>
-            <div id="climateMessage" class="message"></div>
-        </div>
 
-        <!-- Agriculture Data Form -->
-        <div id="agricultureTab" class="tab-content">
-            <h2>Insert Agriculture Data</h2>
-            <form id="agricultureForm" class="data-form">
-                <div class="form-group">
-                    <label for="agri_region">Region</label>
-                    <select id="agri_region" required>
-                        <option value="">Loading regions...</option>
-                    </select>
+                <!-- CLIMATE FORM -->
+                <div id="climateTab" class="tab-content active">
+                    <h2 class="form-header">Insert Climate Record</h2>
+                    <form id="climateForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="climate_region">Region</label>
+                            <select id="climate_region" class="region-select" required>
+                                <option value="" disabled selected>Select Region...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="temperature">Temperature (°C)</label>
+                            <input type="number" step="0.01" id="temperature" class="swiss-input" required
+                                placeholder="e.g. 24.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="rainfall">Rainfall (mm)</label>
+                            <input type="number" step="0.01" id="rainfall" class="swiss-input" required
+                                placeholder="e.g. 120.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="humidity">Humidity (%)</label>
+                            <input type="number" step="0.01" id="humidity" class="swiss-input" required
+                                placeholder="e.g. 65">
+                        </div>
+                        <button type="submit" class="btn-swiss">Insert Climate Data</button>
+                    </form>
+                    <div id="climateMessage" class="message"></div>
                 </div>
-                <div class="form-group">
-                    <label for="crop_type">Crop Type</label>
-                    <input type="text" id="crop_type" required placeholder="e.g., Wheat">
-                </div>
-                <div class="form-group">
-                    <label for="yield">Yield (tons)</label>
-                    <input type="number" step="0.01" id="yield" required placeholder="e.g., 45.5">
-                </div>
-                <div class="form-group">
-                    <label for="season">Season</label>
-                    <select id="season" required>
-                        <option value="">Select season</option>
-                        <option value="Spring">Spring</option>
-                        <option value="Summer">Summer</option>
-                        <option value="Fall">Fall</option>
-                        <option value="Winter">Winter</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="year">Year</label>
-                    <input type="number" id="year" required placeholder="e.g., 2024" value="2024">
-                </div>
-                <button type="submit" class="btn btn-primary">Insert Agriculture Data</button>
-            </form>
-            <div id="agricultureMessage" class="message"></div>
-        </div>
 
-        <!-- Sensor Log Form -->
-        <div id="sensorTab" class="tab-content">
-            <h2>Insert Sensor Log (MongoDB)</h2>
-            <form id="sensorForm" class="data-form">
-                <div class="form-group">
-                    <label for="sensor_id">Sensor ID</label>
-                    <input type="text" id="sensor_id" required placeholder="e.g., SENS_001">
+                <!-- AGRICULTURE FORM -->
+                <div id="agricultureTab" class="tab-content">
+                    <h2 class="form-header">Insert Agriculture Data</h2>
+                    <form id="agricultureForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="agri_region">Region</label>
+                            <select id="agri_region" class="region-select" required>
+                                <option value="" disabled selected>Select Region...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="crop_type">Crop Type</label>
+                            <input type="text" id="crop_type" class="swiss-input" required placeholder="e.g. Wheat">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="yield">Yield (tons)</label>
+                            <input type="number" step="0.01" id="yield" class="swiss-input" required
+                                placeholder="e.g. 45.2">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="season">Season</label>
+                            <select id="season" required>
+                                <option value="Spring">Spring</option>
+                                <option value="Summer">Summer</option>
+                                <option value="Fall">Fall</option>
+                                <option value="Winter">Winter</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="year">Year</label>
+                            <input type="number" id="year" class="swiss-input" required value="2024">
+                        </div>
+                        <button type="submit" class="btn-swiss">Insert Agriculture Data</button>
+                    </form>
+                    <div id="agricultureMessage" class="message"></div>
                 </div>
-                <div class="form-group">
-                    <label for="sensor_region">Region</label>
-                    <select id="sensor_region" required>
-                        <option value="">Loading regions...</option>
-                    </select>
+
+                <!-- REGION FORM -->
+                <div id="regionTab" class="tab-content">
+                    <h2 class="form-header">Add New Region</h2>
+                    <form id="regionForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="region_name">Region Name</label>
+                            <input type="text" id="region_name" class="swiss-input" required
+                                placeholder="e.g. Serengeti National Park">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="latitude">Latitude</label>
+                            <input type="number" step="0.0000001" id="latitude" class="swiss-input" required
+                                placeholder="e.g. -2.3333">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="longitude">Longitude</label>
+                            <input type="number" step="0.0000001" id="longitude" class="swiss-input" required
+                                placeholder="e.g. 34.8333">
+                        </div>
+                        <button type="submit" class="btn-swiss">Register Region</button>
+                    </form>
+                    <div id="regionMessage" class="message"></div>
                 </div>
-                <div class="form-group">
-                    <label for="event_type">Event Type</label>
-                    <input type="text" id="event_type" required placeholder="e.g., temperature_spike">
+
+                <!-- SENSOR LOG FORM -->
+                <div id="sensorTab" class="tab-content">
+                    <h2 class="form-header">Log Sensor Event</h2>
+                    <form id="sensorForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="sensor_id">Sensor ID</label>
+                            <input type="text" id="sensor_id" class="swiss-input" required placeholder="e.g. SN-4092">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sensor_region">Region</label>
+                            <select id="sensor_region" class="region-select" required>
+                                <option value="" disabled selected>Select Region...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="event_type">Event Type</label>
+                            <input type="text" id="event_type" class="swiss-input" required
+                                placeholder="e.g. CO2_SPIKE">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="severity">Severity</label>
+                            <select id="severity" required>
+                                <option value="info">Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="message">Message</label>
+                            <textarea id="message" required placeholder="Describe the anomaly..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-swiss">Insert Sensor Log</button>
+                    </form>
+                    <div id="sensorMessage" class="message"></div>
                 </div>
-                <div class="form-group">
-                    <label for="severity">Severity</label>
-                    <select id="severity" required>
-                        <option value="">Select severity</option>
-                        <option value="info">Info</option>
-                        <option value="warning">Warning</option>
-                        <option value="critical">Critical</option>
-                    </select>
+
+                <!-- BIODIVERSITY FORM -->
+                <div id="biodiversityTab" class="tab-content">
+                    <h2 class="form-header">Insert Biodiversity Data</h2>
+                    <form id="biodiversityForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="bio_id">ID</label>
+                            <input type="text" id="bio_id" class="swiss-input" required placeholder="e.g. BIO101">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="bio_region">Region</label>
+                            <select id="bio_region" class="region-select" required>
+                                <option value="" disabled selected>Select Region...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="bio_species_count">Species Count</label>
+                            <input type="number" id="bio_species_count" class="swiss-input" required
+                                placeholder="e.g. 5000">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="bio_endangered">Endangered Species (comma separated)</label>
+                            <input type="text" id="bio_endangered" class="swiss-input"
+                                placeholder="e.g. Tiger, Elephant">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="bio_flora">Dominant Flora (comma separated)</label>
+                            <input type="text" id="bio_flora" class="swiss-input" placeholder="e.g. Oak, Fern">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="bio_status">Conservation Status</label>
+                            <select id="bio_status" required>
+                                <option value="Stable">Stable</option>
+                                <option value="Vulnerable">Vulnerable</option>
+                                <option value="Endangered">Endangered</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-swiss">Insert Biodiversity Data</button>
+                    </form>
+                    <div id="biodiversityMessage" class="message"></div>
                 </div>
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" required placeholder="Describe the sensor event..."></textarea>
+
+                <!-- AIR QUALITY FORM -->
+                <div id="air_qualityTab" class="tab-content">
+                    <h2 class="form-header">Log Air Quality History</h2>
+                    <form id="air_qualityForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="aq_id">ID</label>
+                            <input type="text" id="aq_id" class="swiss-input" required placeholder="e.g. AQ-99">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="aq_region">Region</label>
+                            <select id="aq_region" class="region-select" required>
+                                <option value="" disabled selected>Select Region...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="aq_aqi">AQI</label>
+                            <input type="number" id="aq_aqi" class="swiss-input" required placeholder="e.g. 45">
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-8">
+                            <div class="form-group">
+                                <label class="swiss-label" for="aq_co2">CO2 (ppm)</label>
+                                <input type="number" step="0.1" id="aq_co2" class="swiss-input" placeholder="410">
+                            </div>
+                            <div class="form-group">
+                                <label class="swiss-label" for="aq_pm25">PM2.5</label>
+                                <input type="number" step="0.1" id="aq_pm25" class="swiss-input" placeholder="12.5">
+                            </div>
+                            <div class="form-group">
+                                <label class="swiss-label" for="aq_pm10">PM10</label>
+                                <input type="number" step="0.1" id="aq_pm10" class="swiss-input" placeholder="25">
+                            </div>
+                            <div class="form-group">
+                                <label class="swiss-label" for="aq_no2">NO2</label>
+                                <input type="number" step="0.1" id="aq_no2" class="swiss-input" placeholder="15">
+                            </div>
+                            <div class="form-group">
+                                <label class="swiss-label" for="aq_so2">SO2</label>
+                                <input type="number" step="0.1" id="aq_so2" class="swiss-input" placeholder="8.5">
+                            </div>
+                            <div class="form-group">
+                                <label class="swiss-label" for="aq_o3">O3</label>
+                                <input type="number" step="0.1" id="aq_o3" class="swiss-input" placeholder="55.3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="aq_status">Quality Level</label>
+                            <select id="aq_status" required>
+                                <option value="Excellent">Excellent</option>
+                                <option value="Good">Good</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Unhealthy">Unhealthy</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-swiss">Log Air Quality</button>
+                    </form>
+                    <div id="air_qualityMessage" class="message"></div>
                 </div>
-                <button type="submit" class="btn btn-primary">Insert Sensor Log</button>
-            </form>
-            <div id="sensorMessage" class="message"></div>
-        </div>
+
+                <!-- SPECIES FORM -->
+                <div id="speciesTab" class="tab-content">
+                    <h2 class="form-header">Add Species Details</h2>
+                    <form id="speciesForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="sp_id">ID</label>
+                            <input type="text" id="sp_id" class="swiss-input" required placeholder="e.g. SP001">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sp_common">Common Name</label>
+                            <input type="text" id="sp_common" class="swiss-input" required placeholder="e.g. Red Panda">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sp_scientific">Scientific Name</label>
+                            <input type="text" id="sp_scientific" class="swiss-input"
+                                placeholder="e.g. Ailurus fulgens">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sp_habitat">Habitat Region IDs (comma separated)</label>
+                            <input type="text" id="sp_habitat" class="swiss-input" placeholder="e.g. 1, 5, 8">
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-8">
+                            <div class="form-group">
+                                <label class="swiss-label" for="sp_pop">Population Estimate</label>
+                                <input type="number" id="sp_pop" class="swiss-input" placeholder="10000">
+                            </div>
+                            <div class="form-group">
+                                <label class="swiss-label" for="sp_lifespan">Lifespan (years)</label>
+                                <input type="number" id="sp_lifespan" class="swiss-input" placeholder="15">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="diet">Diet</label>
+                            <select id="diet" class="swiss-input">
+                                <option value="Herbivore">Herbivore</option>
+                                <option value="Carnivore">Carnivore</option>
+                                <option value="Omnivore">Omnivore</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sp_status">Conservation Status</label>
+                            <input type="text" id="sp_status" class="swiss-input" placeholder="Endangered">
+                        </div>
+                        <button type="submit" class="btn-swiss">Save Species Info</button>
+                    </form>
+                    <div id="speciesMessage" class="message"></div>
+                </div>
+
+                <!-- SENSOR METADATA FORM -->
+                <div id="sensor_metadataTab" class="tab-content">
+                    <h2 class="form-header">Add Sensor Metadata</h2>
+                    <form id="sensor_metadataForm">
+                        <div class="form-group">
+                            <label class="swiss-label" for="sm_id">Sensor ID</label>
+                            <input type="text" id="sm_id" class="swiss-input" required placeholder="e.g. SENS-X-99">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sm_type">Sensor Type</label>
+                            <input type="text" id="sm_type" class="swiss-input" required
+                                placeholder="e.g. Soil Moisture">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sm_region">Region</label>
+                            <select id="sm_region" class="region-select" required>
+                                <option value="" disabled selected>Select Region...</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-x-8">
+                            <div class="form-group">
+                                <label class="swiss-label" for="sm_manu">Manufacturer</label>
+                                <input type="text" id="sm_manu" class="swiss-input" placeholder="EnviroTech">
+                            </div>
+                            <div class="form-group">
+                                <label class="swiss-label" for="sm_model">Model</label>
+                                <input type="text" id="sm_model" class="swiss-input" placeholder="M-100">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sm_accuracy">Accuracy Rating (0.0 - 1.0)</label>
+                            <input type="number" step="0.01" id="sm_accuracy" class="swiss-input" placeholder="0.95">
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label" for="sm_measurements">Measurements (comma separated)</label>
+                            <input type="text" id="sm_measurements" class="swiss-input" placeholder="moisture, temp">
+                        </div>
+                        <button type="submit" class="btn-swiss">Save Sensor Metadata</button>
+                    </form>
+                    <div id="sensor_metadataMessage" class="message"></div>
+                </div>
+
+            </div>
+        </main>
     </div>
 
+    <!-- Logic maintained strictly -->
     <script src="data-provider.js"></script>
 </body>
+
 </html>

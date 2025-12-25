@@ -99,6 +99,19 @@ INSERT INTO Region_Info (region_name, latitude, longitude) VALUES
 ('Himalayas', 28.5983, 83.9956),
 ('Great Plains', 41.4925, -99.9018),
 ('Madagascar', -18.7669, 46.8691);
+('Patagonia', -49.3315, -72.8860),
+('Andes Mountains', -13.1631, -72.5450),
+('Gobi Desert', 42.5903, 103.4319),
+('Yellowstone National Park', 44.4280, -110.5885),
+('Sundarbans Mangrove Forest', 21.9497, 89.1833),
+('Borneo Rainforest', 0.7893, 113.9213),
+('Taiga Forest (Siberia)', 61.5240, 105.3188),
+('Atacama Desert', -23.8634, -69.1328),
+('Galápagos Islands', -0.9538, -90.9656),
+('Scottish Highlands', 57.1200, -4.7100),
+('Alps', 46.8182, 8.2275),
+('Okavango Delta', -19.2870, 22.4430);
+
 
 -- Sample Climate Data
 INSERT INTO Climate_Data (region_id, temperature, rainfall, humidity, timestamp) VALUES
@@ -114,6 +127,19 @@ INSERT INTO Climate_Data (region_id, temperature, rainfall, humidity, timestamp)
 (6, 15.2, 1200.40, 70.5, '2024-01-15 08:00:00'),
 (7, 18.5, 600.25, 55.3, '2024-01-15 08:00:00'),
 (8, 22.1, 1400.90, 75.8, '2024-01-15 08:00:00');
+(9, 6.4, 520.30, 68.2, '2024-01-15 08:00:00'),     -- Patagonia
+(10, 12.8, 980.75, 72.5, '2024-01-15 08:00:00'),  -- Andes Mountains
+(11, -4.6, 180.40, 41.3, '2024-01-15 08:00:00'),  -- Gobi Desert
+(12, 2.1, 760.90, 65.7, '2024-01-15 08:00:00'),   -- Yellowstone
+(13, 26.9, 2100.60, 88.9, '2024-01-15 08:00:00'), -- Sundarbans
+(14, 27.3, 2450.20, 90.4, '2024-01-15 08:00:00'), -- Borneo Rainforest
+(15, -8.2, 430.10, 55.6, '2024-01-15 08:00:00'),  -- Siberian Taiga
+(16, 18.7, 22.40, 19.8, '2024-01-15 08:00:00'),   -- Atacama Desert
+(17, 24.5, 610.85, 77.2, '2024-01-15 08:00:00'),  -- Galápagos
+(18, 5.9, 1350.40, 81.6, '2024-01-15 08:00:00'),  -- Scottish Highlands
+(19, -1.8, 1180.30, 69.1, '2024-01-15 08:00:00'), -- Alps
+(20, 29.4, 690.75, 64.8, '2024-01-15 08:00:00');  -- Okavango Delta
+
 
 -- Sample Agriculture Data
 INSERT INTO Agriculture_Data (region_id, crop_type, yield, season, year) VALUES
@@ -127,6 +153,19 @@ INSERT INTO Agriculture_Data (region_id, crop_type, yield, season, year) VALUES
 (8, 'Rice', 30.4, 'Spring', 2023),
 (8, 'Vanilla', 2.1, 'Fall', 2023),
 (6, 'Barley', 15.3, 'Summer', 2023);
+(9,  'Sheep Grazing',  1.85, 'Summer', 2023),   -- Patagonia
+(10, 'Potatoes',      3.20, 'Autumn', 2023),   -- Andes Mountains
+(11, 'Barley',        1.10, 'Spring', 2023),   -- Gobi (irrigated pockets)
+(12, 'Wheat',         4.75, 'Summer', 2023),   -- Yellowstone region
+(8, 'Rice',          6.90, 'Monsoon', 2023),  -- Sundarbans
+(14, 'Oil Palm',      4.60, 'Annual',  2023),  -- Borneo Rainforest
+(15, 'Rye',           2.30, 'Summer', 2023),   -- Siberian Taiga
+(15, 'Quinoa',        0.95, 'Winter',  2023),  -- Atacama (oasis farming)
+(7, 'Banana',        7.80, 'Annual',  2023),  -- Galápagos (limited zones)
+(18, 'Barley',        3.60, 'Spring',  2023),  -- Scottish Highlands
+(19, 'Grapes',        5.40, 'Autumn',  2023),  -- Alps
+(20, 'Maize',         4.20, 'Summer',  2023);  -- Okavango Delta
+
 
 -- Sample Query Logs (for demonstration)
 INSERT INTO Query_Log (user_id, query_text) VALUES

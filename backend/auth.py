@@ -62,6 +62,12 @@ def authenticate_user(email, password):
         query = "SELECT user_id, name, email, password_hash, role FROM user_info WHERE email = %s"
         results = db_manager.postgres.execute_query(query, (email,))
         
+        # If results is None, the DB call failed (e.g., connection issues)
+        if results is None:
+            print("Authentication Error: PostgreSQL unavailable")
+            # Return a sentinel to indicate DB error to caller
+            return {'_db_error': True}
+
         if not results or len(results) == 0:
             return None
         

@@ -1,105 +1,731 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Federated Query - Environmental Intelligence Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Federated Query - Environmental Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #F7F7F7;
+            --surface-color: #FFFFFF;
+            --text-main: #111111;
+            --text-secondary: #666666;
+            --accent-color: #00CC66;
+            /* Swiss Green */
+            --accent-dark: #008f47;
+            /* Darker Swiss Green for text */
+            --accent-hover: #00A352;
+            --border-color: #E0E0E0;
+            --error-color: #FF3D00;
+            --mono-font: 'JetBrains Mono', monospace;
+            --sans-font: 'Inter', sans-serif;
+            --easing: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--sans-font);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* --- LAYOUT --- */
+        .swiss-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 1024px) {
+            .swiss-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 40px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            line-height: 1.1;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 12px 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-bottom: 1px solid transparent;
+            transition: color 0.3s var(--easing), padding-left 0.3s var(--easing);
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--text-main);
+            padding-left: 10px;
+            border-bottom: 1px solid var(--accent-color);
+        }
+
+        .schema-card {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+
+        .section-title::before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: var(--accent-color);
+            display: block;
+        }
+
+        .schema-group {
+            margin-bottom: 24px;
+        }
+
+        .schema-group h4 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .schema-item {
+            font-family: var(--mono-font);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            padding: 0;
+        }
+
+        .hero-section {
+            padding: 80px 60px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--surface-color);
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            max-width: 900px;
+            margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* --- INTERACTIVE AREAS (TOGGLE LAYOUT) --- */
+        .interaction-area {
+            border-bottom: 1px solid var(--border-color);
+            background: var(--surface-color);
+        }
+
+        /* Toggle Bar */
+        .toggle-bar {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 60px;
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-group {
+            display: flex;
+            background: #F4F4F4;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        .toggle-btn {
+            padding: 8px 24px;
+            border: none;
+            background: transparent;
+            font-family: var(--sans-font);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s var(--easing);
+        }
+
+        .toggle-btn.active {
+            background: var(--surface-color);
+            color: var(--text-main);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Panels */
+        .view-panel {
+            display: none;
+            padding: 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s var(--easing);
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- INPUTS --- */
+        .swiss-input {
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid var(--border-color);
+            background: transparent;
+            font-size: 1.5rem;
+            font-family: var(--sans-font);
+            padding: 10px 0;
+            margin-bottom: 20px;
+            transition: border-color 0.3s var(--easing);
+            outline: none;
+            border-radius: 0;
+            color: var(--text-main);
+        }
+
+        .swiss-input:focus {
+            border-color: var(--text-main);
+        }
+
+        .swiss-input::placeholder {
+            color: #CCC;
+        }
+
+        .swiss-textarea {
+            width: 100%;
+            min-height: 200px;
+            background: #F4F4F4;
+            border: none;
+            padding: 20px;
+            font-family: var(--mono-font);
+            font-size: 0.9rem;
+            color: var(--text-main);
+            resize: vertical;
+            outline: none;
+            border-left: 4px solid transparent;
+            transition: border-left 0.3s var(--easing);
+        }
+
+        .swiss-textarea:focus {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-swiss {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            background: var(--text-main);
+            color: var(--surface-color);
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.2s var(--easing), background 0.2s;
+        }
+
+        .btn-swiss:hover {
+            transform: translateY(-2px);
+            background: var(--accent-color);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--text-main);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--text-main);
+            color: var(--surface-color);
+        }
+
+        /* --- RESULTS SECTION --- */
+        .results-section {
+            padding: 60px;
+            background: var(--bg-color);
+            min-height: 400px;
+        }
+
+        /* The resultsArea is where the table is injected */
+        #resultsArea {
+            width: 100%;
+            overflow-x: auto;
+            /* Auto scroll for wide tables */
+            background: var(--surface-color);
+            /* Elevated shadow effect */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono-font);
+            font-size: 0.85rem;
+            background: var(--surface-color);
+            margin-top: 0;
+            border: 1px solid var(--border-color);
+            /* Outer border */
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 16px 20px;
+            background: #F8F9FA;
+            /* Light grey header */
+            color: var(--accent-dark);
+            /* Dark Swiss Green text */
+            text-transform: uppercase;
+            font-weight: 800;
+            /* Bolder font weight */
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+            border: 1px solid var(--border-color);
+            /* Grid border */
+            border-bottom: 2px solid var(--text-main);
+            /* Thick header bottom */
+        }
+
+        .data-table td {
+            padding: 12px 20px;
+            /* Grid borders for every cell */
+            border: 1px solid var(--border-color);
+            /* Grid border */
+            white-space: nowrap;
+            color: #333333;
+            /* Dark grey entries */
+        }
+
+        .data-table tr:hover td {
+            background: #F0FAF5;
+            /* Swiss green subtle tint */
+            color: #000000;
+        }
+
+        /* Ensure specific table container styles if generated by JS */
+        .table-container {
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            /* Shadow for JS generated container */
+        }
+
+        /* --- MESSAGES & INFO --- */
+        .message {
+            padding: 15px;
+            margin-top: 20px;
+            font-family: var(--mono-font);
+            font-size: 0.85rem;
+            border-left: 4px solid #333;
+            display: none;
+        }
+
+        .message:not(:empty) {
+            display: block;
+        }
+
+        .message.success {
+            border-color: var(--accent-color);
+            background: #E8F5E9;
+            color: #1B5E20;
+        }
+
+        .message.error {
+            border-color: var(--error-color);
+            background: #FFEBEE;
+            color: #B71C1C;
+        }
+
+        .message.info {
+            border-color: #2196F3;
+            background: #E3F2FD;
+            color: #0D47A1;
+        }
+
+        .message.warning {
+            border-color: #FF9800;
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .info-box {
+            background: #FFFFFF;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .info-box strong {
+            display: inline-block;
+            width: 140px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        #generatedSQL {
+            background: #F4F4F4;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: var(--mono-font);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        /* --- SAMPLE QUERIES --- */
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .sample-query-card {
+            background: var(--surface-color);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sample-query-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        .sample-query-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .sample-query-card p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.7rem;
+            background: #111;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .loading {
+            color: var(--text-secondary);
+            font-family: var(--mono-font);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .placeholder {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* --- VISUALIZATION SECTION --- */
+        #vizSection {
+            margin-top: 40px;
+            padding: 30px;
+            background: #FFF;
+            border: 1px solid var(--border-color);
+            display: none;
+            /* Hidden by default, shown for Researchers */
+        }
+
+        .viz-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+    </style>
 </head>
+
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">🌍 Environmental Intelligence Platform</div>
-        <div class="nav-menu">
-            <a href="dashboard.html" class="btn btn-secondary">Dashboard</a>
-            <button onclick="logout()" class="btn btn-secondary">Logout</button>
-        </div>
-    </nav>
 
-    <div class="container">
-        <h1>🔍 Federated Query Interface</h1>
-        <p class="subtitle">Execute SQL queries across PostgreSQL, MongoDB, and CSV files using Apache Drill</p>
+    <div class="swiss-grid">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <div>
+                <div class="brand">Federated Climate<br>Platform</div>
+                <nav>
+                    <a href="dashboard.html" class="nav-item">Dashboard</a>
+                    <a href="admin.html" class="nav-item">Admin Panel</a>
+                </nav>
 
-        <!-- Natural Language Query Section -->
-        <div class="query-section">
-            <div class="query-input-area">
-                <h2>💬 Natural Language Query</h2>
-                <p class="info-text">Ask questions in plain English!</p>
-                <input type="text" id="naturalQueryInput" placeholder="e.g., Show all regions with high temperature, List species with climate data, What are the top crop producing regions?" class="natural-input">
-                
-                <div class="query-actions">
-                    <button onclick="executeNaturalQuery()" class="btn btn-primary">🤖 Ask Question</button>
-                    <button onclick="clearNaturalQuery()" class="btn btn-secondary">Clear</button>
-                </div>
-
-                <div id="naturalQueryInfo" class="info-box" style="display:none;">
-                    <strong>Interpreted as:</strong> <span id="interpretation"></span><br>
-                    <strong>Confidence:</strong> <span id="confidence"></span><br>
-                    <strong>Generated SQL:</strong> <pre id="generatedSQL"></pre>
-                </div>
-
-                <div id="naturalMessage" class="message"></div>
-            </div>
-        </div>
-
-        <!-- SQL Query Section -->
-        <div class="query-section">
-            <div class="query-input-area">
-                <h2>📝 SQL Query Editor</h2>
-                <textarea id="queryInput" placeholder="Enter your SQL query here...
-Example:
-SELECT * FROM postgres.public.`region_info` LIMIT 10;"></textarea>
-                
-                <div class="query-actions">
-                    <button onclick="executeQuery()" class="btn btn-primary">Execute Query</button>
-                    <button onclick="clearQuery()" class="btn btn-secondary">Clear</button>
-                </div>
-
-                <div id="queryMessage" class="message"></div>
-            </div>
-
-            <div class="sample-queries">
-                <h2>Sample Federated Queries</h2>
-                <div id="sampleQueriesList">
-                    <p>Loading sample queries...</p>
+                <div class="schema-card">
+                    <div class="section-title">Data Schema</div>
+                    <div class="schema-group">
+                        <h4>PostgreSQL</h4>
+                        <span class="schema-item">public.Region_Info</span>
+                        <span class="schema-item">public.Climate_Data</span>
+                        <span class="schema-item">public.Agriculture_Data</span>
+                    </div>
+                    <div class="schema-group">
+                        <h4>MongoDB</h4>
+                        <span class="schema-item">env_db.Biodiversity_Data</span>
+                        <span class="schema-item">env_db.Sensor_Logs</span>
+                    </div>
+                    <div class="schema-group">
+                        <h4>Data Lake (CSV)</h4>
+                        <span class="schema-item">dfs.data.sensor_readings</span>
+                    </div>
                 </div>
             </div>
-        </div>
+            <button onclick="logout()" class="btn-swiss btn-outline"
+                style="width: 100%; margin-top: 20px;">Logout</button>
+        </aside>
 
-        <div class="results-section">
-            <h2>Query Results</h2>
-            <div id="resultsArea">
-                <p class="placeholder">Execute a query to see results here</p>
-            </div>
-        </div>
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
 
-        <div class="info-section">
-            <h2>📚 Query Guide</h2>
-            <div class="info-grid">
-                <div class="info-card">
-                    <h3>PostgreSQL Tables</h3>
-                    <code>postgres.public.`Region_Info`</code><br>
-                    <code>postgres.public.`Climate_Data`</code><br>
-                    <code>postgres.public.`Agriculture_Data`</code><br>
-                    <code>postgres.public.`User_Info`</code><br>
-                    <code>postgres.public.`Query_Log`</code>
-                </div>
-                <div class="info-card">
-                    <h3>MongoDB Collections</h3>
-                    <code>mongo.environmental_db.`Biodiversity_Data`</code><br>
-                    <code>mongo.environmental_db.`Sensor_Logs`</code><br>
-                    <code>mongo.environmental_db.`Air_Quality_History`</code><br>
-                    <code>mongo.environmental_db.`Species_Details`</code><br>
-                    <code>mongo.environmental_db.`Sensor_Metadata`</code>
-                </div>
-                <div class="info-card">
-                    <h3>CSV Files</h3>
-                    <code>dfs.data.`sensor_readings.csv`</code>
-                    <p><small>Contains: timestamp, region_id, co2_level, pm2_5</small></p>
+            <header class="hero-section">
+                <div class="section-title">Federated Query Engine</div>
+                <h1 class="hero-title">Unified Environmental Data Access.</h1>
+                <p class="hero-subtitle">Execute complex queries across PostgreSQL, MongoDB, and Data Lakes using Apache
+                    Drill architecture.</p>
+            </header>
+
+            <!-- TOGGLE BAR -->
+            <div class="toggle-bar">
+                <div class="toggle-group">
+                    <button class="toggle-btn active" onclick="switchView('nlp')" id="btn-nlp">Natural Language</button>
+                    <button class="toggle-btn" onclick="switchView('sql')" id="btn-sql">SQL Editor</button>
                 </div>
             </div>
-        </div>
+
+            <!-- INTERACTION AREAS -->
+            <div class="interaction-area">
+
+                <!-- VIEW 1: NATURAL LANGUAGE -->
+                <div id="view-nlp" class="view-panel active">
+                    <div class="section-title">Natural Language</div>
+                    <h3 style="margin-bottom: 20px;">Ask in plain English.</h3>
+                    <input type="text" id="naturalQueryInput" class="swiss-input"
+                        placeholder="e.g. Regions with temp > 30 and high CO2...">
+
+                    <!-- ID structure matched to query.js -->
+                    <div id="naturalQueryInfo" class="info-box">
+                        <div><strong>Interpretation:</strong> <span id="interpretation"></span></div>
+                        <div style="margin-top: 8px;"><strong>Confidence:</strong> <span id="confidence"></span></div>
+                        <div style="margin-top: 8px;"><strong>SQL:</strong>
+                            <pre id="generatedSQL"></pre>
+                        </div>
+                    </div>
+
+                    <div id="naturalMessage" class="message"></div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button onclick="executeNaturalQuery()" class="btn-swiss">Ask AI</button>
+                        <button onclick="clearNaturalQuery()" class="btn-swiss btn-outline">Clear</button>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: SQL EDITOR -->
+                <div id="view-sql" class="view-panel">
+                    <div class="section-title">SQL Editor</div>
+                    <h3 style="margin-bottom: 20px;">Direct Query.</h3>
+                    <textarea id="queryInput" class="swiss-textarea" spellcheck="false"
+                        placeholder="SELECT * FROM postgres.public.Region_Info LIMIT 10;"></textarea>
+
+                    <div id="queryMessage" class="message"></div>
+
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button onclick="executeQuery()" class="btn-swiss">Run SQL</button>
+                        <button onclick="clearQuery()" class="btn-swiss btn-outline">Clear</button>
+                    </div>
+
+                    <!-- Sample Queries Container -->
+                    <div style="margin-top: 40px;">
+                        <div class="section-title">Sample Queries</div>
+                        <div id="sampleQueriesList" class="sample-grid">
+                            <p style="font-size: 0.8rem; color: #999;">Loading samples...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTS SECTION -->
+            <section class="results-section">
+                <div class="section-title">Query Results</div>
+                <div id="resultsArea">
+                    <div style="text-align: center; color: var(--text-secondary); padding: 40px;">
+                        <span style="font-size: 3rem; display: block; margin-bottom: 10px; opacity: 0.2;">⚗️</span>
+                        <p class="placeholder">Execute a query to see results here</p>
+                    </div>
+                </div>
+
+                <!-- VISUALIZATION SECTION (Researcher Only) -->
+                <div id="vizSection">
+                    <div class="section-title">Data Visualization</div>
+                    <div class="viz-controls">
+                        <div class="form-group">
+                            <label class="swiss-label">X-Axis (Category)</label>
+                            <select id="xAxisSelect" class="swiss-input" style="font-size: 1rem;"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label">Y-Axis (Value)</label>
+                            <select id="yAxisSelect" class="swiss-input" style="font-size: 1rem;"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="swiss-label">Chart Type</label>
+                            <select id="chartTypeSelect" class="swiss-input" style="font-size: 1rem;">
+                                <option value="bar">Bar Chart</option>
+                                <option value="line">Line Chart</option>
+                                <option value="pie">Pie Chart</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: flex-end; padding-bottom: 20px;">
+                            <button onclick="generateChart()" class="btn-swiss" style="width: 100%;">Generate
+                                Chart</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="dataChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </main>
     </div>
 
+    <!-- UI Helper for Query.js: Table Rendering Logic -->
+    <script>
+        // Toggle View Function
+        function switchView(viewName) {
+            // Hide all panels
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
+
+            // Show selected
+            document.getElementById('view-' + viewName).classList.add('active');
+            document.getElementById('btn-' + viewName).classList.add('active');
+        }
+
+        // Define renderDataTable globally so query.js can find it
+        window.renderDataTable = function (containerId, columns, data) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p class="message info">No results returned.</p>';
+                return;
+            }
+
+            let html = '<div style="overflow-x: auto;"><table class="data-table"><thead><tr>';
+            columns.forEach(col => {
+                html += `<th>${col}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                html += '<tr>';
+                columns.forEach(col => {
+                    let val = row[col];
+                    if (val === null || val === undefined) val = '<span style="color:#ccc">NULL</span>';
+                    else if (typeof val === 'object') val = JSON.stringify(val);
+                    html += `<td>${val}</td>`;
+                });
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        };
+    </script>
+
+    <!-- LOAD THE USER'S QUERY LOGIC -->
     <script src="query.js"></script>
 </body>
+
 </html>

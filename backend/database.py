@@ -57,7 +57,10 @@ class PostgresDB:
         """
         try:
             if not self.connection or self.connection.closed:
-                self.connect()
+                connected = self.connect()
+                if not connected:
+                    print("PostgreSQL Query Error: could not establish connection (check POSTGRES_PASSWORD and DB server).")
+                    return None
             
             cursor = self.connection.cursor(cursor_factory=RealDictCursor)
             cursor.execute(query, params)
@@ -83,7 +86,10 @@ class PostgresDB:
         """
         try:
             if not self.connection or self.connection.closed:
-                self.connect()
+                connected = self.connect()
+                if not connected:
+                    print("PostgreSQL Update Error: could not establish connection (check POSTGRES_PASSWORD and DB server).")
+                    return False
             
             cursor = self.connection.cursor()
             cursor.execute(query, params)

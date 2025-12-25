@@ -9,12 +9,16 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
 # PostgreSQL Configuration
+_postgres_password = os.getenv('POSTGRES_PASSWORD') or os.getenv('PGPASSWORD')
+if _postgres_password is None:
+    print("WARNING: POSTGRES_PASSWORD not set. Create a .env file with POSTGRES_PASSWORD to enable PostgreSQL connections.")
+
 POSTGRES_CONFIG = {
     'host': os.getenv('POSTGRES_HOST', 'localhost'),
     'port': int(os.getenv('POSTGRES_PORT', 5432)),
     'database': os.getenv('POSTGRES_DB', 'environmental_db'),
     'user': os.getenv('POSTGRES_USER', 'postgres'),
-    'password': os.getenv('POSTGRES_PASSWORD')
+    'password': _postgres_password
 }
 
 # MongoDB Configuration

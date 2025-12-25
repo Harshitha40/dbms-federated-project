@@ -65,6 +65,13 @@ def login():
         
         # Authenticate user
         user = authenticate_user(email, password)
+
+        # Handle DB availability case
+        if isinstance(user, dict) and user.get('_db_error'):
+            return jsonify({
+                'success': False,
+                'error': 'Database unavailable. Please check PostgreSQL configuration.'
+            }), 500
         
         if user:
             # Create session
@@ -196,6 +203,7 @@ def federated_query():
         }), 500
 
 
+
 @app.route('/api/sample-queries', methods=['GET'])
 @role_required('Researcher', 'Administrator')
 def sample_queries():
@@ -264,77 +272,94 @@ def sample_queries():
         {
             'name': 'Climate vs Biodiversity',
             'description': 'Federated join: PostgreSQL + MongoDB',
-            'query': '''SELECT 
+            'query': '''WITH 
+                pg_region AS (SELECT region_id, region_name FROM postgres.public.`region_info`),
+                pg_climate AS (SELECT region_id, temperature, humidity FROM postgres.public.`climate_data`),
+                mongo_bio AS (SELECT region_id, species_count, conservation_status FROM mongo.environmental_db.`Biodiversity_Data`)
+            SELECT 
                 r.region_name,
                 c.temperature,
                 c.humidity,
                 b.species_count,
                 b.conservation_status
-            FROM postgres.public.`region_info` r
-            JOIN postgres.public.`climate_data` c ON r.region_id = c.region_id
-            JOIN mongo.environmental_db.`Biodiversity_Data` b ON r.region_id = b.region_id
-            LIMIT 5'''
+            FROM pg_region r
+            JOIN pg_climate c ON r.region_id = c.region_id
+            JOIN mongo_bio b ON r.region_id = b.region_id
+            LIMIT 50'''
         },
         {
             'name': 'Sensors vs Climate',
             'description': 'Federated join: CSV + PostgreSQL',
-            'query': '''SELECT 
+            'query': '''WITH 
+                csv_sensors AS (SELECT CAST(region_id AS INT) as rid, CAST(co2_level AS FLOAT) as co2, CAST(pm2_5 AS FLOAT) as pm FROM dfs.data.`sensor_readings.csv`),
+                pg_region AS (SELECT region_id, region_name FROM postgres.public.`region_info`),
+                pg_climate AS (SELECT region_id, temperature, humidity FROM postgres.public.`climate_data`)
+            SELECT 
                 r.region_name,
-                s.co2_level,
-                s.pm2_5,
+                s.co2 as co2_level,
+                s.pm as pm2_5,
                 c.temperature,
                 c.humidity
-            FROM dfs.data.`sensor_readings.csv` s
-            JOIN postgres.public.`region_info` r ON CAST(s.region_id AS INT) = r.region_id
-            JOIN postgres.public.`climate_data` c ON r.region_id = c.region_id
-            LIMIT 10'''
+            FROM csv_sensors s
+            JOIN pg_region r ON s.rid = r.region_id
+            JOIN pg_climate c ON r.region_id = c.region_id
+            LIMIT 50'''
         },
         {
             'name': 'Complete Environmental View',
-            'description': 'Join all 3 sources: PostgreSQL + MongoDB + CSV',
-            'query': '''SELECT 
+            'description': 'Join PostgreSQL (3 tables) + MongoDB',
+            'query': '''WITH 
+                pg_region AS (SELECT region_id, region_name FROM postgres.public.`region_info`),
+                pg_climate AS (SELECT region_id, temperature, rainfall FROM postgres.public.`climate_data`),
+                pg_agri AS (SELECT region_id, crop_type, `yield` as crop_yield FROM postgres.public.`agriculture_data`),
+                mongo_bio AS (SELECT region_id, species_count FROM mongo.environmental_db.`Biodiversity_Data`)
+            SELECT 
                 r.region_name,
                 c.temperature,
                 c.rainfall,
                 a.crop_type,
-                a.yield,
-                b.species_count,
-                s.co2_level,
-                s.pm2_5
-            FROM postgres.public.`region_info` r
-            LEFT JOIN postgres.public.`climate_data` c ON r.region_id = c.region_id
-            LEFT JOIN postgres.public.`agriculture_data` a ON r.region_id = a.region_id
-            LEFT JOIN mongo.environmental_db.`Biodiversity_Data` b ON r.region_id = b.region_id
-            LEFT JOIN dfs.data.`sensor_readings.csv` s ON CAST(s.region_id AS INT) = r.region_id
-            LIMIT 15'''
+                a.crop_yield,
+                b.species_count
+            FROM pg_region r
+            LEFT JOIN pg_climate c ON r.region_id = c.region_id
+            LEFT JOIN pg_agri a ON r.region_id = a.region_id
+            LEFT JOIN mongo_bio b ON r.region_id = b.region_id
+            LIMIT 50'''
         },
         {
             'name': 'High Temp Regions with Species',
             'description': 'Filter + join: Hot regions with biodiversity',
-            'query': '''SELECT 
+            'query': '''WITH 
+                pg_region AS (SELECT region_id, region_name FROM postgres.public.`region_info`),
+                pg_climate AS (SELECT region_id, temperature FROM postgres.public.`climate_data`),
+                mongo_bio AS (SELECT region_id, species_count, conservation_status FROM mongo.environmental_db.`Biodiversity_Data`)
+            SELECT 
                 r.region_name,
                 c.temperature,
                 b.species_count,
                 b.conservation_status
-            FROM postgres.public.`climate_data` c
-            JOIN postgres.public.`region_info` r ON c.region_id = r.region_id
-            JOIN mongo.environmental_db.`Biodiversity_Data` b ON r.region_id = b.region_id
+            FROM pg_climate c
+            JOIN pg_region r ON c.region_id = r.region_id
+            JOIN mongo_bio b ON r.region_id = b.region_id
             WHERE c.temperature > 25
-            LIMIT 10'''
+            LIMIT 50'''
         },
         {
             'name': 'High CO2 Regions Analysis',
             'description': 'CSV sensors + PostgreSQL regions',
-            'query': '''SELECT 
+            'query': '''WITH 
+                csv_sensors AS (SELECT CAST(region_id AS INT) as rid, CAST(co2_level AS FLOAT) as co2, CAST(pm2_5 AS FLOAT) as pm FROM dfs.data.`sensor_readings.csv`),
+                pg_region AS (SELECT region_id, region_name FROM postgres.public.`region_info`)
+            SELECT 
                 r.region_name,
-                AVG(CAST(s.co2_level AS FLOAT)) as avg_co2,
-                AVG(CAST(s.pm2_5 AS FLOAT)) as avg_pm25,
+                AVG(s.co2) as avg_co2,
+                AVG(s.pm) as avg_pm25,
                 COUNT(*) as reading_count
-            FROM dfs.data.`sensor_readings.csv` s
-            JOIN postgres.public.`region_info` r ON CAST(s.region_id AS INT) = r.region_id
+            FROM csv_sensors s
+            JOIN pg_region r ON s.rid = r.region_id
             GROUP BY r.region_name
-            HAVING AVG(CAST(s.co2_level AS FLOAT)) > 420
-            LIMIT 10'''
+            HAVING AVG(s.co2) > 420
+            LIMIT 50'''
         },
         {
             'name': 'Critical Conservation Regions',
@@ -348,7 +373,7 @@ def sample_queries():
             FROM mongo.environmental_db.`Biodiversity_Data` b
             JOIN postgres.public.`region_info` r ON b.region_id = r.region_id
             WHERE b.conservation_status = 'Critical'
-            LIMIT 10'''
+            LIMIT 50'''
         },
         {
             'name': 'Top Crop Producing Regions',
@@ -360,7 +385,7 @@ def sample_queries():
             FROM postgres.public.`agriculture_data` a
             JOIN postgres.public.`region_info` r ON a.region_id = r.region_id
             GROUP BY r.region_name
-            LIMIT 10'''
+            LIMIT 50'''
         }
     ]
     
@@ -371,7 +396,7 @@ def sample_queries():
 
 
 @app.route('/api/natural-query', methods=['POST'])
-@role_required('Researcher', 'Administrator')
+@role_required('Researcher', 'Administrator', 'Data Provider')
 def natural_query():
     """
     Convert natural language query to SQL and execute it.
@@ -544,43 +569,116 @@ def insert_agriculture():
 @app.route('/api/insert-sensor-log', methods=['POST'])
 @role_required('Data Provider', 'Administrator')
 def insert_sensor_log():
-    """
-    Insert new sensor log into MongoDB.
-    Expects JSON: {"sensor_id": "SENS_001", "region_id": 1, "event_type": "...", "severity": "...", "message": "..."}
-    """
     try:
         data = request.get_json()
-        
         required_fields = ['sensor_id', 'region_id', 'event_type', 'severity', 'message']
         for field in required_fields:
             if field not in data:
-                return jsonify({
-                    'success': False,
-                    'error': f'Missing required field: {field}'
-                }), 400
-        
-        # Add timestamp
+                return jsonify({'success': False, 'error': f'Missing field: {field}'}), 400
         data['timestamp'] = datetime.utcnow()
-        
         result = db_manager.mongo.insert_one('Sensor_Logs', data)
-        
         if result:
-            return jsonify({
-                'success': True,
-                'message': 'Sensor log inserted successfully',
-                'id': result
-            }), 201
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to insert sensor log'
-            }), 500
-            
+            return jsonify({'success': True, 'message': 'Sensor log inserted successfully', 'id': str(result)}), 201
+        return jsonify({'success': False, 'error': 'Failed to insert sensor log'}), 500
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': f'Insert error: {str(e)}'
-        }), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/insert-region', methods=['POST'])
+@role_required('Data Provider', 'Administrator')
+def insert_region():
+    try:
+        data = request.get_json()
+        required = ['region_name', 'latitude', 'longitude']
+        for field in required:
+            if field not in data:
+                return jsonify({'success': False, 'error': f'Missing field: {field}'}), 400
+        
+        query = "INSERT INTO region_info (region_name, latitude, longitude) VALUES (%s, %s, %s)"
+        success = db_manager.postgres.execute_update(query, (data['region_name'], data['latitude'], data['longitude']))
+        
+        if success:
+            return jsonify({'success': True, 'message': 'Region inserted successfully'}), 201
+        return jsonify({'success': False, 'error': 'Failed to insert region'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/insert-biodiversity', methods=['POST'])
+@role_required('Data Provider', 'Administrator')
+def insert_biodiversity():
+    try:
+        data = request.get_json()
+        # biodiversity_id, region_id, region_name, species_count, endangered_species, dominant_flora, conservation_status
+        data['last_survey_date'] = datetime.utcnow()
+        # Handle arrays
+        if isinstance(data.get('endangered_species'), str):
+            data['endangered_species'] = [s.strip() for s in data['endangered_species'].split(',') if s.strip()]
+        if isinstance(data.get('dominant_flora'), str):
+            data['dominant_flora'] = [s.strip() for s in data['dominant_flora'].split(',') if s.strip()]
+            
+        result = db_manager.mongo.insert_one('Biodiversity_Data', data)
+        if result:
+            return jsonify({'success': True, 'message': 'Biodiversity data inserted successfully'}), 201
+        return jsonify({'success': False, 'error': 'Failed to insert biodiversity data'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/insert-air-quality', methods=['POST'])
+@role_required('Data Provider', 'Administrator')
+def insert_air_quality():
+    try:
+        data = request.get_json()
+        # reading_id, region_id, aqi, co2, pm2_5, pm10, no2, so2, o3, air_quality_level
+        data['recorded_at'] = datetime.utcnow()
+        # Restructure pollutants if they are flat in the request
+        pollutants = {
+            'co2': data.pop('co2', None),
+            'pm2_5': data.pop('pm2_5', None),
+            'pm10': data.pop('pm10', None),
+            'no2': data.pop('no2', None),
+            'so2': data.pop('so2', None),
+            'o3': data.pop('o3', None)
+        }
+        data['pollutants'] = pollutants
+        
+        result = db_manager.mongo.insert_one('Air_Quality_History', data)
+        if result:
+            return jsonify({'success': True, 'message': 'Air quality record inserted successfully'}), 201
+        return jsonify({'success': False, 'error': 'Failed to insert air quality record'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/insert-species', methods=['POST'])
+@role_required('Data Provider', 'Administrator')
+def insert_species():
+    try:
+        data = request.get_json()
+        # species_id, common_name, scientific_name, habitat_regions, population_estimate, conservation_status, diet, lifespan_years
+        if isinstance(data.get('habitat_regions'), str):
+            data['habitat_regions'] = [int(r.strip()) for r in data['habitat_regions'].split(',') if r.strip()]
+            
+        result = db_manager.mongo.insert_one('Species_Details', data)
+        if result:
+            return jsonify({'success': True, 'message': 'Species detail inserted successfully'}), 201
+        return jsonify({'success': False, 'error': 'Failed to insert species detail'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/insert-sensor-metadata', methods=['POST'])
+@role_required('Data Provider', 'Administrator')
+def insert_sensor_metadata():
+    try:
+        data = request.get_json()
+        # sensor_id, sensor_type, region_id, region_name, manufacturer, model, status, measurements, accuracy_rating
+        data['installation_date'] = datetime.utcnow()
+        if isinstance(data.get('measurements'), str):
+            data['measurements'] = [m.strip() for m in data['measurements'].split(',') if m.strip()]
+            
+        result = db_manager.mongo.insert_one('Sensor_Metadata', data)
+        if result:
+            return jsonify({'success': True, 'message': 'Sensor metadata inserted successfully'}), 201
+        return jsonify({'success': False, 'error': 'Failed to insert sensor metadata'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # ========================================

@@ -1,0 +1,16 @@
+﻿
+============================================================
+Testing: GROUP BY with CTE
+============================================================
+Query:
+
+        WITH pg_climate AS (
+            SELECT region_id, temperature 
+            FROM postgres.public.`climate_data`
+        )
+        SELECT region_id, AVG(temperature) as avg_temp
+        FROM pg_climate
+        GROUP BY region_id
+        LIMIT 5
+    
+
